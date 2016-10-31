@@ -11,14 +11,16 @@ namespace sp
     class vector_base
     {
     public:
-        typedef _T  ValueType;
-        typedef _T* ValueTypePointer;
-        typedef _T& ValueTypeReference;
+        typedef _T            value_type;
+        typedef _T*           pointer;
+        typedef const _T*     const_pointer;
+        typedef _T&           reference;
+        typedef const _T&     const_reference;
 
         class const_iterator
         {
         public:
-            const_iterator(ValueTypePointer vtp) : _Current(vtp) {}
+            const_iterator(pointer vtp) : _Current(vtp) {}
             const_iterator(const const_iterator& oth) : _Current(oth._Current) {}
             const_iterator& operator++()
             {
@@ -42,25 +44,25 @@ namespace sp
                 --*this;
                 return tmp;
             }
-            const_iterator operator+(int diff)
+            const_iterator operator+(ptrdiff_t diff)
             {
                 const_iterator tmp = _Current + diff;
                 return tmp;
             }
-            const_iterator operator-(int diff)
+            const_iterator operator-(ptrdiff_t diff)
             {
                 const_iterator tmp = _Current - diff;
                 return tmp;
             }
-            int operator-(const const_iterator& oth) const
+            ptrdiff_t operator-(const const_iterator& oth) const
             {
                 return _Current - oth._Current;
             }
-            const ValueTypeReference operator*() const
+            const reference operator*() const
             {
                 return (*_Current);
             }
-            const ValueTypePointer operator->() const
+            const pointer operator->() const
             {
                 return (&(**this));
             }
@@ -90,18 +92,18 @@ namespace sp
                 return (*this) > oth || *this == oth;
             }
 
-            ValueTypePointer _Current;
+            pointer _Current;
         };
         class iterator : public const_iterator
         {
         public:
-            iterator(ValueTypePointer vtp) : const_iterator(vtp) {}
+            iterator(pointer vtp) : const_iterator(vtp) {}
             iterator(const const_iterator& oth) : const_iterator(oth) { }
-            ValueTypeReference operator*() const
+            reference operator*() const
             {
                 return (*_Current);
             }
-            ValueTypePointer operator->() const
+            pointer operator->() const
             {
                 return (&(**this);)
             }
@@ -127,25 +129,25 @@ namespace sp
                 --*(const_iterator*)this;
                 return tmp;
             }
-            iterator operator+(int diff)
+            iterator operator+(ptrdiff_t diff)
             {
                 iterator tmp = *(const_iterator*)this + diff;
                 return tmp;
             }
-            iterator operator-(int diff)
+            iterator operator-(ptrdiff_t diff)
             {
                 iterator tmp = *(const_iterator*)this - diff;
                 return tmp;
             }
-            int operator-(iterator it)
+            ptrdiff_t operator-(iterator it)
             {
                 return (*(const_iterator*)this - it);
             }
-            operator ValueTypePointer()
+            operator pointer()
             {
                 return _Current;
             }
-            ValueTypeReference operator[](int off) const
+            reference operator[](int off) const
             {	
                 return (*(*this + off));
             }
@@ -155,12 +157,12 @@ namespace sp
         vector_base() : _Size(0), _Capacity(0), _Value(nullptr)
         {
         }
-        vector_base(size_t size, ValueType dt) : _Size(size) ,_Capacity(_Size), _Value( new ValueType[_Capacity])
+        vector_base(size_t size, value_type dt) : _Size(size) ,_Capacity(_Size), _Value( new value_type[_Capacity])
         {
             for (size_t i = 0; i < _Size; i++)
                 _Value[i] = dt;
         }
-        vector_base(const vector_base& oth) :_Size(oth._Size),_Capacity(oth._Capacity), _Value( new ValueType[_Capacity])
+        vector_base(const vector_base& oth) :_Size(oth._Size),_Capacity(oth._Capacity), _Value( new value_type[_Capacity])
         {
             for (size_t i = 0; i < _Size; i++)
                 _Value[i] = oth._Value[i];
@@ -177,7 +179,7 @@ namespace sp
                 new_cap = 1;
             _Capacity = new_cap;
             auto tmp = _Value;
-            _Value = new ValueType[_Capacity];
+            _Value = new value_type[_Capacity];
             for (size_t i = 0; i < _Size; i++)
                 _Value[i] = tmp[i];
             if (tmp)
@@ -187,7 +189,7 @@ namespace sp
     protected:
         size_t _Capacity;
         size_t _Size;
-        ValueTypePointer _Value;
+        pointer _Value;
 
     };
     
@@ -199,36 +201,37 @@ namespace sp
         typedef vector_base<_T> base_type;
         typedef base_type::iterator iterator;
         typedef base_type::const_iterator const_iterator;
+
     public:
         vector(): vector_base() {}
-        vector(size_t size , ValueType dt) : base_type(size,dt) {}
+        vector(size_t size , value_type dt) : base_type(size,dt) {}
         // 这里没有拷贝构造函数，这个行为由vector_base<_T>来完成
-        // CVector<_T>默认的浅拷贝，会调用vector_base<_T>的拷贝构造函数
+        // vector<_T>默认的浅拷贝，会调用vector_base<_T>的拷贝构造函数
         
-        iterator begin()
+        inline iterator begin()
         {
             return iterator(_Value);
         }
-        iterator end()
+        inline iterator end()
         {
             return iterator(_Value + _Size);
         }
-        const_iterator begin() const
+        inline const_iterator begin() const
         {
-            return const_iterator(begin());
+            return const_iterator(_Value);
         }
-        const_iterator end() const
+        inline const_iterator end() const
         {
-            return const_iterator(end());
+            return const_iterator(_Value + _Size);
         }
 
-        void assign(iterator itstart, iterator itbegin, iterator itend)
+        void assign(const iterator& itstart,const iterator& itbegin,const iterator& itend)
         {
             size_t new_size = itend - itbegin;
             if (new_size > _Capacity)
                 ReAlloc(new_size);
             _Size = new_size;
-            ValueTypePointer pbegin，pend, pstart;
+            pointer pbegin，pend, pstart;
             pstart = itstart;
             pbegin = itbegin;
             pend = itend;
@@ -236,24 +239,24 @@ namespace sp
             for (; pbegin != pend; ++pbegin,++pstart)
                 *pstart = *pbegin;
         }
-        void assign(iterator itbegin, iterator itend)
+        void assign(const iterator& itbegin, const iterator& itend)
         {
             assign(begin(), itbegin, itend);
         }
 
-        ValueTypeReference elementAt(size_t index)
+        reference elementAt(size_t index)
         {
             return (*this)[index];
         }
 
 
-        void push_back(const ValueType& value)
+        void push_back(const value_type& value)
         {
             if (_Size == _Capacity)
                 ReAlloc(size_t(_Capacity * VECTOR_INCREASE_FACTOR));
             _Value[_Size++] = value;
         }
-        void insert(const_iterator& index, const ValueType& value)
+        void insert(const_iterator& index, const value_type& value)
         {
            
             // 0<= index <= _Size-1
@@ -274,7 +277,7 @@ namespace sp
                     index = begin() + diff;
 
                 // 使用指针操作。。。这里如果用迭代器的话，效率低的惊人
-                ValueTypePointer v1, v2;
+                pointer v1, v2;
                 v1 = end()._Current;
                 v2 = v1 - 1;
                 for (; v2 >= index._Current; v1--,v2--)
@@ -285,19 +288,19 @@ namespace sp
             }
            
         }
-        ValueType pop()
+        value_type pop()
         {
             return _Value[--_Size];
         }
 
-        iterator erase(const_iterator it1, const_iterator it2)
+        iterator erase(const_iterator& it1, const_iterator& it2)
         {
             if (it1 == begin() && it2 == end())
                 clear();
             else
             {
-                ValueTypePointer it11 = iterator(it1);
-                ValueTypePointer it22 = iterator(it2);
+                pointer it11 = iterator(it1);
+                pointer it22 = iterator(it2);
                 auto itend = end();
                 for (; it22 != itend._Current; ++it22, ++it11)
                     *it11 = *it22;
@@ -314,13 +317,13 @@ namespace sp
         }
 
         // vector[5] = xxx;
-        ValueTypeReference operator[](size_t index)
+        reference operator[](size_t index)
         {
             // 0 <= index <= _Size-1;
             return _Value[index];
         }
         // xxx =  vector[5];
-        const ValueTypeReference operator[](size_t index) const
+        const reference operator[](size_t index) const
         {
             // 0 <= index <= _Size-1;
             return _Value[index];
