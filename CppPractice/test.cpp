@@ -17,15 +17,24 @@ void test_vector()
     }*/
     vec.insert(vec.begin(), 5);
     
-    for (int i = 0; i < 100000; i++)
+    /*for (int i = 0; i < 100000; i++)
     {
         vec.push_back(i);
+    }*/
+
+    vec.clear();
+
+    for (int i = 0; i < 100000; i++)
+    {
+        vec.insert(vec.begin(), i);
     }
+
+    cout << vec.size() << endl;
+    cout << vec.count << endl;
 }
 
 void test_array()
 {
-    sp::array<int, 5> a;
 }
 
 void main()

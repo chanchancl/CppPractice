@@ -3,9 +3,12 @@
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
 
+#include "algorithm.h"
+#include "uninitialized.h"
+
 namespace sp
 {
-#define VECTOR_INCREASE_FACTOR 2
+#define VECTOR_INCREASE_FACTOR (2)
 
     template<class _T>
     class vector_base
@@ -16,78 +19,78 @@ namespace sp
         typedef const _T*     const_pointer;
         typedef _T&           reference;
         typedef const _T&     const_reference;
+        typedef size_t        size_type;
+        typedef ptrdiff_t     difference_type;
 
         class const_iterator
         {
         public:
             const_iterator(pointer vtp) : _Current(vtp) {}
             const_iterator(const const_iterator& oth) : _Current(oth._Current) {}
-            const_iterator& operator++()
+            inline const_iterator& operator++()
             {
                 _Current++;
                 return (*this);
             }
-            const_iterator operator++(int)
+            inline const_iterator operator++(int)
             {
                 const_iterator tmp = *this;
                 ++*this;
                 return tmp;
             }
-            const_iterator& operator--()
+            inline const_iterator& operator--()
             {
                 _Current--;
                 return (*this);
             }
-            const_iterator operator--(int)
+            inline const_iterator operator--(int)
             {
                 const_iterator tmp = *this;
                 --*this;
                 return tmp;
             }
-            const_iterator operator+(ptrdiff_t diff)
+            inline const_iterator operator+(difference_type diff)
             {
-                const_iterator tmp = _Current + diff;
-                return tmp;
+                return _Current + diff;
             }
-            const_iterator operator-(ptrdiff_t diff)
+            inline const_iterator operator-(difference_type diff)
             {
-                const_iterator tmp = _Current - diff;
-                return tmp;
+                return _Current - diff;
             }
-            ptrdiff_t operator-(const const_iterator& oth) const
+            inline difference_type operator-(const const_iterator& oth) const
             {
                 return _Current - oth._Current;
             }
-            const reference operator*() const
+            inline const reference operator*() const
             {
                 return (*_Current);
             }
-            const pointer operator->() const
+            inline const pointer operator->() const
             {
                 return (&(**this));
             }
 
-            bool operator==(const const_iterator& oth) const
+            inline bool operator==(const const_iterator& oth) const
             {
                 return _Current == oth._Current;
             }
-            bool operator!=(const const_iterator& oth) const
+            inline bool operator!=(const const_iterator& oth) const
             {
                 return !((*this) == oth);
             }
-            bool operator<(const const_iterator& oth) const
+            inline bool operator<(const const_iterator& oth) const
             {
                 return (oth - (*this)) > 0;
             }
-            bool operator>(const const_iterator& oth) const
+            inline bool operator>(const const_iterator& oth) const
             {
                 return ((*this) - oth) > 0;
             }
-            bool operator<=(const const_iterator& oth) const
+            inline bool operator<=(const const_iterator& oth) const
             {
                 return (*this) < oth || *this == oth;
             }
-            bool operator>=(const const_iterator& oth) const
+            inline bool operator>=(const const_iterator& oth) const
             {
                 return (*this) > oth || *this == oth;
             }
@@ -97,241 +100,275 @@ namespace sp
         class iterator : public const_iterator
         {
         public:
-            iterator(pointer vtp) : const_iterator(vtp) {}
+            iterator() : const_iterator(nullptr) {}
+            iterator(const pointer vtp) : const_iterator(vtp) {}
             iterator(const const_iterator& oth) : const_iterator(oth) { }
-            reference operator*() const
+
+            void operator=(const pointer ptr)
+            {
+                _Current = ptr;
+            }
+
+            inline reference operator*() const
             {
                 return (*_Current);
             }
-            pointer operator->() const
+            inline pointer operator->() const
             {
-                return (&(**this);)
+                return _Current;
             }
-            iterator& operator++()
+            inline iterator& operator++()
             {
                 ++*(const_iterator*)this;
                 return (*this);
             }
-            iterator operator++(int)
+            inline iterator operator++(int)
             {
                 iterator tmp = *this;
                 ++*(const_iterator*)this;
                 return tmp;
             }
-            iterator& operator--()
+            inline iterator& operator--()
             {
                 --*(const_iterator*)this;
                 return (*this);
             }
-            iterator operator--(int)
+            inline iterator operator--(int)
             {
                 iterator tmp = *this;
                 --*(const_iterator*)this;
                 return tmp;
             }
-            iterator operator+(ptrdiff_t diff)
+            inline iterator operator+(difference_type diff) const
             {
                 iterator tmp = *(const_iterator*)this + diff;
                 return tmp;
             }
-            iterator operator-(ptrdiff_t diff)
+            inline iterator operator-(difference_type diff) const
             {
                 iterator tmp = *(const_iterator*)this - diff;
                 return tmp;
             }
-            ptrdiff_t operator-(iterator it)
+            inline difference_type operator-(const iterator& it) const
             {
                 return (*(const_iterator*)this - it);
             }
-            operator pointer()
+            inline operator pointer()
             {
                 return _Current;
             }
-            reference operator[](int off) const
+            inline reference operator[](int off) const
             {	
                 return (*(*this + off));
             }
         };
         
     public:
-        vector_base() : _Size(0), _Capacity(0), _Value(nullptr)
+        vector_base()
         {
+            _begin = _end = _end_capacity;
+            count = 0;
         }
-        vector_base(size_t size, value_type dt) : _Size(size) ,_Capacity(_Size), _Value( new value_type[_Capacity])
+        vector_base(size_t size, value_type dt) 
         {
-            for (size_t i = 0; i < _Size; i++)
-                _Value[i] = dt;
-        }
-        vector_base(const vector_base& oth) :_Size(oth._Size),_Capacity(oth._Capacity), _Value( new value_type[_Capacity])
-        {
-            for (size_t i = 0; i < _Size; i++)
-                _Value[i] = oth._Value[i];
-        }
-        ~vector_base()
-        {
-            if (_Capacity > 0)
-                delete[] _Value;
+            _begin = new value_type[size];
+            _end = _end_capacity = _begin + size;
+            
         }
 
-        void ReAlloc(size_t new_cap)
+        ~vector_base()
         {
-            if (new_cap == 0)
-                new_cap = 1;
-            _Capacity = new_cap;
-            auto tmp = _Value;
-            _Value = new value_type[_Capacity];
-            for (size_t i = 0; i < _Size; i++)
-                _Value[i] = tmp[i];
-            if (tmp)
-                delete[] tmp;
+            dealloc();
+        }
+
+        void dealloc()
+        {
+            if (_begin._Current)
+                delete[] _begin._Current;
+            _begin._Current = nullptr;
+        }
+
+        inline size_type capacity()
+        {
+            return _end_capacity - _begin;
+        }
+
+        inline size_type size()
+        {
+            return _end - _begin;
         }
 
     protected:
-        size_t _Capacity;
-        size_t _Size;
-        pointer _Value;
+        iterator _begin;
+        iterator _end;
+        iterator _end_capacity;
 
+    public:
+        int count;
     };
     
     template<class _T>
-    class vector : vector_base<_T>
+    class vector : public vector_base<_T>
     {
     public:
         typedef vector<_T> this_type;
         typedef vector_base<_T> base_type;
         typedef base_type::iterator iterator;
         typedef base_type::const_iterator const_iterator;
+        typedef base_type::size_type size_type;
+        typedef base_type::difference_type difference_type;
 
     public:
         vector(): vector_base() {}
-        vector(size_t size , value_type dt) : base_type(size,dt) {}
+        vector(size_type size , value_type dt) : base_type(size,dt) {}
         // 这里没有拷贝构造函数，这个行为由vector_base<_T>来完成
         // vector<_T>默认的浅拷贝，会调用vector_base<_T>的拷贝构造函数
         
         inline iterator begin()
         {
-            return iterator(_Value);
+            return _begin;
         }
         inline iterator end()
         {
-            return iterator(_Value + _Size);
+            return _end;
         }
         inline const_iterator begin() const
         {
-            return const_iterator(_Value);
+            return _begin;
         }
         inline const_iterator end() const
         {
-            return const_iterator(_Value + _Size);
-        }
-
-        void assign(const iterator& itstart,const iterator& itbegin,const iterator& itend)
-        {
-            size_t new_size = itend - itbegin;
-            if (new_size > _Capacity)
-                ReAlloc(new_size);
-            _Size = new_size;
-            pointer pbegin，pend, pstart;
-            pstart = itstart;
-            pbegin = itbegin;
-            pend = itend;
-
-            for (; pbegin != pend; ++pbegin,++pstart)
-                *pstart = *pbegin;
-        }
-        void assign(const iterator& itbegin, const iterator& itend)
-        {
-            assign(begin(), itbegin, itend);
-        }
-
-        reference elementAt(size_t index)
-        {
-            return (*this)[index];
+            return _end;
         }
 
 
         void push_back(const value_type& value)
         {
-            if (_Size == _Capacity)
-                ReAlloc(size_t(_Capacity * VECTOR_INCREASE_FACTOR));
-            _Value[_Size++] = value;
-        }
-        void insert(const_iterator& index, const value_type& value)
-        {
-           
-            // 0<= index <= _Size-1
-            int diff = -1;
-            if (_Size == _Capacity)
+            if (_end != _end_capacity)
             {
-                diff = index - begin();
-                ReAlloc(size_t(_Capacity * VECTOR_INCREASE_FACTOR));
-            }  
-            
-            if (_Size == 0)
-                push_back(value);
-            else if ( index == end() )
-                push_back(value);
+                Construct(_end, value);
+                _end++;
+            }
+            else
+                insert(end(), value);
+        }
+        inline void push_back() 
+        {
+            push_back(value_type());
+        }
+
+        iterator insert(const iterator& position, const value_type& value)
+        {
+            size_type n = position - begin();
+            if (_end != _end_capacity && position == end())
+            {
+                sp::Construct(_end, value);
+                _end++;
+            }
+
+            else
+                insert_aux(position, value);
+            return begin() + n;
+        }
+        inline iterator insert(iterator position)
+        {
+            insert(position, value_type());
+        }
+        void insert_aux(iterator position, const value_type& x)
+        {
+            if (_end != _end_capacity)
+            {
+                Construct(_end, *(_end - 1));
+                value_type x_copy = x;
+
+                iterator cur1 = _end-2;
+                iterator cur2 = _end-1;
+                for (; cur2 != position; --cur1, --cur2)
+                    *cur2 = *cur1;
+
+                *position = x_copy;
+            }
             else
             {
-                if( diff >= 0)
-                    index = begin() + diff;
+                const size_type old_size = size();
+                const size_type len = old_size != 0 ? VECTOR_INCREASE_FACTOR * old_size : 1;
 
-                // 使用指针操作。。。这里如果用迭代器的话，效率低的惊人
-                pointer v1, v2;
-                v1 = end()._Current;
-                v2 = v1 - 1;
-                for (; v2 >= index._Current; v1--,v2--)
-                    *v1 = *v2;
-                _Size++;
-                *index._Current = value;
+
+                count++;
+                iterator new_begin = new value_type[len];
+                iterator new_end = new_begin;
+
+                // uninitizlized_copy(begin(),position,new_end);
                 
+                new_end = uninitialized_copy(_begin, position, new_end);
+                /*
+                    // they are equal .
+                    iterator cur = begin();
+                    while (cur != position)
+                        *new_end++ = *cur++;
+                */
+
+                *new_end++ = x;
+
+                new_end = uninitialized_copy(position, end(), new_end);
+                /*
+                    // they are equal
+                    while (cur != end())
+                        *new_end++ = *cur++;
+                */
+
+                // 析构
+                Destroy(_begin, _end);
+
+                // 释放内存
+                if (pointer(_begin))
+                    delete[] pointer(_begin);
+
+                _begin = new_begin;
+                _end = new_end;
+                _end_capacity = _begin + len;
             }
-           
-        }
-        value_type pop()
-        {
-            return _Value[--_Size];
+
         }
 
-        iterator erase(const_iterator& it1, const_iterator& it2)
+        void pop_back()
         {
-            if (it1 == begin() && it2 == end())
-                clear();
-            else
-            {
-                pointer it11 = iterator(it1);
-                pointer it22 = iterator(it2);
-                auto itend = end();
-                for (; it22 != itend._Current; ++it22, ++it11)
-                    *it11 = *it22;
-                _Size -= it22 - it11;
-            }
-            return iterator(it1);
+            --_end;
+            Destroy(_end);
+        }
+
+        iterator erase(iterator position)
+        {
+            if (last + 1 != end())
+                copy(position + 1, end(), position);
+            --_end;
+            Destroy(_end);
+            return position;
+        }
+
+        iterator erase(iterator first, iterator last)
+        {
+            iterator i = copy(last, _end, first);
+            Destroy(i, _end);
+            _end = _end - (last - first);
+            return first;
         }
 
         void clear()
         {
-            if (_Capacity)
-                delete[] _Value;
-            _Size = _Capacity = 0;
+            erase(_begin, _end);
         }
 
         // vector[5] = xxx;
         reference operator[](size_t index)
         {
-            // 0 <= index <= _Size-1;
-            return _Value[index];
+            return *(_begin._Current + index);
         }
         // xxx =  vector[5];
-        const reference operator[](size_t index) const
+        const value_type operator[](size_t index) const
         {
             // 0 <= index <= _Size-1;
-            return _Value[index];
-        }
-        this_type& operator=(const this_type& oth)
-        {
-            // 只装有用的
-            assign(oth.begin(), oth.end());
+            return return *(_begin._Current + index);
         }
     };
 

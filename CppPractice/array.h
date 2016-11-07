@@ -1,5 +1,12 @@
 #pragma once
 
+/*
+    array.h
+
+    2016.11.6
+        ÉÐÎ´Íê³É.
+*/
+
 namespace sp
 {
     template<class _T, size_t _N>
