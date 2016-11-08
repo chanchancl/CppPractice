@@ -8,7 +8,7 @@ using namespace std;
 
 void test_vector()
 {
-    sp::vector<int> vec;
+    std::vector<int> vec;
     vec.push_back(233);
     
     /*for (int i = 0; i < 100000; i++)
@@ -30,7 +30,6 @@ void test_vector()
     }
 
     cout << vec.size() << endl;
-    cout << vec.count << endl;
 }
 
 void test_array()

@@ -6,6 +6,9 @@
 #include "algorithm.h"
 #include "uninitialized.h"
 
+
+// 越写越乱了。。。尴尬 
+
 namespace sp
 {
 #define VECTOR_INCREASE_FACTOR (2)
@@ -21,158 +24,23 @@ namespace sp
         typedef const _T&     const_reference;
         typedef size_t        size_type;
         typedef ptrdiff_t     difference_type;
+        typedef pointer       iterator;
+        typedef const pointer const_iterator;
 
-        class const_iterator
-        {
-        public:
-            const_iterator(pointer vtp) : _Current(vtp) {}
-            const_iterator(const const_iterator& oth) : _Current(oth._Current) {}
-            inline const_iterator& operator++()
-            {
-                _Current++;
-                return (*this);
-            }
-            inline const_iterator operator++(int)
-            {
-                const_iterator tmp = *this;
-                ++*this;
-                return tmp;
-            }
-            inline const_iterator& operator--()
-            {
-                _Current--;
-                return (*this);
-            }
-            inline const_iterator operator--(int)
-            {
-                const_iterator tmp = *this;
-                --*this;
-                return tmp;
-            }
-            inline const_iterator operator+(difference_type diff)
-            {
-                return _Current + diff;
-            }
-            inline const_iterator operator-(difference_type diff)
-            {
-                return _Current - diff;
-            }
-            inline difference_type operator-(const const_iterator& oth) const
-            {
-                return _Current - oth._Current;
-            }
-            inline const reference operator*() const
-            {
-                return (*_Current);
-            }
-            inline const pointer operator->() const
-            {
-                return (&(**this));
-            }
-
-            inline bool operator==(const const_iterator& oth) const
-            {
-                return _Current == oth._Current;
-            }
-            inline bool operator!=(const const_iterator& oth) const
-            {
-                return !((*this) == oth);
-            }
-            inline bool operator<(const const_iterator& oth) const
-            {
-                return (oth - (*this)) > 0;
-            }
-            inline bool operator>(const const_iterator& oth) const
-            {
-                return ((*this) - oth) > 0;
-            }
-            inline bool operator<=(const const_iterator& oth) const
-            {
-                return (*this) < oth || *this == oth;
-            }
-            inline bool operator>=(const const_iterator& oth) const
-            {
-                return (*this) > oth || *this == oth;
-            }
-
-            pointer _Current;
-        };
-        class iterator : public const_iterator
-        {
-        public:
-            iterator() : const_iterator(nullptr) {}
-            iterator(const pointer vtp) : const_iterator(vtp) {}
-            iterator(const const_iterator& oth) : const_iterator(oth) { }
-
-            void operator=(const pointer ptr)
-            {
-                _Current = ptr;
-            }
-
-            inline reference operator*() const
-            {
-                return (*_Current);
-            }
-            inline pointer operator->() const
-            {
-                return _Current;
-            }
-            inline iterator& operator++()
-            {
-                ++*(const_iterator*)this;
-                return (*this);
-            }
-            inline iterator operator++(int)
-            {
-                iterator tmp = *this;
-                ++*(const_iterator*)this;
-                return tmp;
-            }
-            inline iterator& operator--()
-            {
-                --*(const_iterator*)this;
-                return (*this);
-            }
-            inline iterator operator--(int)
-            {
-                iterator tmp = *this;
-                --*(const_iterator*)this;
-                return tmp;
-            }
-            inline iterator operator+(difference_type diff) const
-            {
-                iterator tmp = *(const_iterator*)this + diff;
-                return tmp;
-            }
-            inline iterator operator-(difference_type diff) const
-            {
-                iterator tmp = *(const_iterator*)this - diff;
-                return tmp;
-            }
-            inline difference_type operator-(const iterator& it) const
-            {
-                return (*(const_iterator*)this - it);
-            }
-            inline operator pointer()
-            {
-                return _Current;
-            }
-            inline reference operator[](int off) const
-            {	
-                return (*(*this + off));
-            }
-        };
-        
     public:
         vector_base()
         {
-            _begin = _end = _end_capacity;
-            count = 0;
+            _begin = _end = _end_capacity = nullptr;
         }
         vector_base(size_t size, value_type dt) 
         {
-            _begin = new value_type[size];
-            _end = _end_capacity = _begin + size;
+            _end = _begin = new value_type[size];
+            for (int i = 0; i < size; i++)
+            {
+                *_end = dt;
+                ++_end;
+            }
+            _end_capacity = _end;
             
         }
 
@@ -183,9 +51,9 @@ namespace sp
 
         void dealloc()
         {
-            if (_begin._Current)
-                delete[] _begin._Current;
-            _begin._Current = nullptr;
+            if (_begin)
+                delete[] _begin;
+            _begin = nullptr;
         }
 
         inline size_type capacity()
@@ -250,20 +118,20 @@ namespace sp
                 _end++;
             }
             else
-                insert(end(), value);
+                insert(_end, value);
         }
         inline void push_back() 
         {
             push_back(value_type());
         }
 
-        iterator insert(const iterator& position, const value_type& value)
+        iterator insert(iterator position, const value_type& value)
         {
             size_type n = position - begin();
-            if (_end != _end_capacity && position == end())
+            if (_end != _end_capacity && position == _end)
             {
-                sp::Construct(_end, value);
-                _end++;
+                Construct(_end, value);
+                ++_end;
             }
 
             else
@@ -273,6 +141,27 @@ namespace sp
         inline iterator insert(iterator position)
         {
             insert(position, value_type());
+        }
+        iterator insert(iterator position, size_type n, const value_type& value)
+        {
+            if (n > 0)
+            {
+                if (n == 1)
+                    return insert(position, value);
+
+                size_type old_n = position - _begin;
+                if (position == _end && (_end_capacity - _end) >= n)
+                {
+                    // 可以插入到尾部
+                    iterator end = position + n;
+                    for (; _end != end; ++_end)
+                        sp::Construct(_end, value);
+                }
+                else
+                    insert_fill(position, n, value);
+
+                return _begin + old_n;
+            }
         }
         void insert_aux(iterator position, const value_type& x)
         {
@@ -287,35 +176,22 @@ namespace sp
                     *cur2 = *cur1;
 
                 *position = x_copy;
+                ++_end;
             }
             else
             {
                 const size_type old_size = size();
                 const size_type len = old_size != 0 ? VECTOR_INCREASE_FACTOR * old_size : 1;
 
-
-                count++;
                 iterator new_begin = new value_type[len];
                 iterator new_end = new_begin;
 
-                // uninitizlized_copy(begin(),position,new_end);
-                
                 new_end = uninitialized_copy(_begin, position, new_end);
-                /*
-                    // they are equal .
-                    iterator cur = begin();
-                    while (cur != position)
-                        *new_end++ = *cur++;
-                */
 
-                *new_end++ = x;
+                *new_end = x;
+                ++new_end;
 
                 new_end = uninitialized_copy(position, end(), new_end);
-                /*
-                    // they are equal
-                    while (cur != end())
-                        *new_end++ = *cur++;
-                */
 
                 // 析构
                 Destroy(_begin, _end);
@@ -329,6 +205,16 @@ namespace sp
                 _end_capacity = _begin + len;
             }
 
+        }
+        void insert_fill(iterator position, size_type n, const value_type& value)
+        {
+           
+            if (_end_capacity - _end >= n)
+            {
+                // 剩余空间可以放下，不必重新分配空间
+                copy_backward(position, _end, position + n);
+
+            }
         }
 
         void pop_back()
@@ -362,13 +248,13 @@ namespace sp
         // vector[5] = xxx;
         reference operator[](size_t index)
         {
-            return *(_begin._Current + index);
+            return *(_begin + index);
         }
         // xxx =  vector[5];
         const value_type operator[](size_t index) const
         {
             // 0 <= index <= _Size-1;
-            return return *(_begin._Current + index);
+            return return *(_begin + index);
         }
     };
 
