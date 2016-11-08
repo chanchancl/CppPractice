@@ -19,6 +19,16 @@ namespace sp
             *result = *last;
         return result;
     }
+
+    template <class InputIter, class T>
+    inline InputIter fill(InputIter first, InputIter last, const T& result)
+    {
+        ptrdiff_t n = last - first;
+        for (; n > 0; ++first)
+            *first = result;
+
+        return first;
+    }
 }
 
 

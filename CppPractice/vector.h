@@ -170,10 +170,11 @@ namespace sp
                 Construct(_end, *(_end - 1));
                 value_type x_copy = x;
 
-                iterator cur1 = _end-2;
-                iterator cur2 = _end-1;
-                for (; cur2 != position; --cur1, --cur2)
-                    *cur2 = *cur1;
+                /*iterator cur1 = _end-2;
+                iterator cur2 = _end-1;*/
+                copy_backward(position, _end - 2, _end - 1);
+               /* for (; cur2 != position; --cur1, --cur2)
+                    *cur2 = *cur1;*/
 
                 *position = x_copy;
                 ++_end;
@@ -214,6 +215,35 @@ namespace sp
                 // 剩余空间可以放下，不必重新分配空间
                 copy_backward(position, _end, position + n);
 
+                fill(position, position + n, value);
+            }
+            else
+            {
+                // 需要重新分配空间
+                const size_type old_size = size();
+                const size_type len = old_size != 0 ? VECTOR_INCREASE_FACTOR * old_size : 1;
+                if (len - old_size < n)
+                    len = old_size + n;
+
+                iterator new_begin = new value_type[len];
+                iterator new_end = new_begin;
+
+                new_end = uninitialized_copy(_begin, position, new_end);
+
+                new_end = fill(_new_end, new_end + n, value);
+
+                new_end = uninitialized_copy(position, end(), new_end);
+
+                // 析构
+                Destroy(_begin, _end);
+
+                // 释放内存
+                if (pointer(_begin))
+                    delete[] pointer(_begin);
+
+                _begin = new_begin;
+                _end = new_end;
+                _end_capacity = _begin + len;
             }
         }
 
