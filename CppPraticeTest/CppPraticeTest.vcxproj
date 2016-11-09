@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{BCE5FD1D-206F-40F7-9B11-12CC6C68CD52}</ProjectGuid>
+    <ProjectGuid>{719906A0-6862-4E03-892F-808900154D89}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>CppPractice</RootNamespace>
+    <RootNamespace>CppPraticeTest</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -93,7 +93,6 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -107,7 +106,6 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -146,15 +144,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ProjectReference Include="..\CppPractice\CppPractice.vcxproj">
+      <Project>{bce5fd1d-206f-40f7-9b11-12cc6c68cd52}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\algorithm.h" />
-    <ClInclude Include="include\array.h" />
-    <ClInclude Include="include\construct.h" />
-    <ClInclude Include="include\type_traits.h" />
-    <ClInclude Include="include\uninitialized.h" />
-    <ClInclude Include="include\vector.h" />
+    <ClCompile Include="TestTypeTraits.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

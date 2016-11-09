@@ -15,27 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\algorithm.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\array.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\construct.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\type_traits.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\uninitialized.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\vector.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="TestTypeTraits.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
