@@ -5,7 +5,7 @@ namespace sp
 {
 
     // add_const
-    template <typename T, bool = sp::is_const<T>::value || sp::is_reference<T>::value || sp::is_function<T>::value >
+    template <typename T, bool = is_const<T>::value || is_reference<T>::value || is_function<T>::value >
     struct add_const_helper { typedef T type; };
 
     template <typename T>
@@ -17,11 +17,11 @@ namespace sp
     template <typename T>
     struct add_const 
     { 
-        typedef typename sp::add_const_helper<T>::type type;
+        typedef typename add_const_helper<T>::type type;
     };
 
     // add volatile
-    template <typename T, bool = sp::is_volatile<T> || sp::is_reference<T>::value || sp::is_function<T>::value >
+    template <typename T, bool = is_volatile<T>::value || is_reference<T>::value || is_function<T>::value>
     struct add_volatile_helper 
     { typedef T type; };
 
@@ -34,14 +34,14 @@ namespace sp
     template <typename T>
     struct add_volatile 
     { 
-        typedef typename sp::add_volatile_helper<T>::type value; 
+        typedef typename add_volatile_helper<T>::type value; 
     };
 
     // add_cv
-    template <typename cv>
+    template <typename T>
     struct add_cv
     {
-        typedef typename add_const<add_volatile<T>::type>::type type;
+        typedef typename add_const<typename add_volatile<T>::type>::type type;
     };
 
     // make_signed
@@ -83,7 +83,7 @@ namespace sp
     template<class T>
     struct add_unsigned : public make_unsigned<T>
     {
-        typedef typename eastl::make_signed<T>::type type;
+        typedef typename make_signed<T>::type type;
     };
 
     // remove_pointer

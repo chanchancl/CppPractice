@@ -16,7 +16,7 @@ namespace sp
     template <> struct is_signed_helper<char>             : public true_type {};
 
     template<typename T>
-    struct is_signed : public sp::is_signed_helper<typename sp::remove_cv<T>::type> {};
+    struct is_signed : public is_signed_helper<typename remove_cv<T>::type> {};
 
 #define DECLARE_SIGNED(T)                                                       \
 	namespace sp{                                                               \
@@ -37,7 +37,7 @@ namespace sp
     template <> struct is_unsigned_helper<wchar_t>            : public true_type {};
 
     template <typename T>
-    struct is_unsigned : public sp::is_unsigned_helper<typename sp::remove_cv<T>::type> {};
+    struct is_unsigned : public is_unsigned_helper<typename remove_cv<T>::type> {};
 
 #define DECLARE_UNSIGNED(T)                                                       \
 	namespace sp{                                                                 \
@@ -50,7 +50,7 @@ namespace sp
     // is_base_of
 
     template <typename Base, typename Derived>
-    struct is_base_of : public sp::integral_constant<bool, __is_base_of(Base, Derived) || sp::is_same<Base, Derived>::value> {};
+    struct is_base_of : public integral_constant<bool, __is_base_of(Base, Derived) || is_same<Base, Derived>::value> {};
 
 
 

@@ -115,7 +115,7 @@ namespace sp
             if (_end != _end_capacity)
             {
                 Construct(_end, value);
-                _end++;
+                ++_end;
             }
             else
                 insert(_end, value);
@@ -272,7 +272,8 @@ namespace sp
 
         void clear()
         {
-            erase(_begin, _end);
+            sp::Destroy(_begin, _end);
+            _end = _begin;
         }
 
         // vector[5] = xxx;

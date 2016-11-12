@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _ITERATOR_H_
+#define _ITERATOR_H_
+
 #include <type_traits.h>
 #include <stddef.h>
 
@@ -250,3 +253,5 @@ namespace sp
 
 
 }
+
+#endif

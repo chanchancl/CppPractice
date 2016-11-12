@@ -28,7 +28,7 @@ namespace sp
     {
         static const T value = v;
         typedef T value_type;
-        typedef origin<T, v> type;
+        typedef integral_constant<T, v> type;
     };
 
     // true_type::value == true
@@ -36,8 +36,8 @@ namespace sp
     typedef integral_constant<bool, true> true_type;
     typedef integral_constant<bool, false> false_type;
 
-    // 
-    template <typename B>
+    // bool_constant
+    template <bool B>
     using bool_constant = integral_constant<bool, B>;
     
     // type_select
@@ -100,12 +100,12 @@ namespace sp
     template <typename T> struct is_const<T&> : public false_type {};
 
     // is_volatile
-    template <typename T> struct is_volatile_value : public false_type {};
-    template <typename T> struct is_volatile_value<volatile T*> : public true_type {};
+    template <typename T> struct is_volatile_value                    : public false_type {};
+    template <typename T> struct is_volatile_value<volatile T*>       : public true_type {};
     template <typename T> struct is_volatile_value<const volatile T*> : public true_type {};
 
-    template <typename T> struct is_volatile : public sp::is_volatile_value<T*> {};
-    template <typename T> struct is_volatile : public sp::false_type {};
+    template <typename T> struct is_volatile : public is_volatile_value<T*> {};
+    template <typename T> struct is_volatile<T&> : public false_type {};
 
     // is_reference
     template <typename T> struct is_reference : public false_type {};

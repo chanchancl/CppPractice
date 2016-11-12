@@ -87,9 +87,9 @@ namespace sp
     template <> struct is_floating_point_helper<long double> : public true_type {};
 
     template <typename T>
-    struct is_floating_point : public is_floating_point_helper<typename sp::remove_cv<T>::type> {};
+    struct is_floating_point : public is_floating_point_helper<typename remove_cv<T>::type> {};
 
-    #define EASTL_DECLARE_FLOATING_POINT(T)                                             \
+    #define sp_DECLARE_FLOATING_POINT(T)                                             \
 	namespace sp{                                                                       \
 		template <> struct is_floating_point<T>                : public true_type{};    \
 		template <> struct is_floating_point<const T>          : public true_type{};    \
@@ -117,7 +117,7 @@ namespace sp
 
     template <typename T>
     struct is_fundamental : public integral_constant<bool,
-        is_integral<T>::value || is_float_point<T>::value || is_void<T>::value || is_null_pointer<T>::value> {};
+        is_integral<T>::value || is_floating_point<T>::value || is_void<T>::value || is_null_pointer<T>::value> {};
 
 
 }
