@@ -79,12 +79,12 @@ namespace sp
     class vector : public vector_base<_T>
     {
     public:
-        typedef vector<_T> this_type;
-        typedef vector_base<_T> base_type;
-        typedef base_type::iterator iterator;
-        typedef base_type::const_iterator const_iterator;
-        typedef base_type::size_type size_type;
-        typedef base_type::difference_type difference_type;
+        typedef vector<_T>                  this_type;
+        typedef vector_base<_T>             base_type;
+        typedef base_type::iterator         iterator;
+        typedef base_type::const_iterator   const_iterator;
+        typedef base_type::size_type        size_type;
+        typedef base_type::difference_type  difference_type;
 
     public:
         vector(): vector_base() {}

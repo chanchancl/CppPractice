@@ -92,24 +92,24 @@ namespace sp
     struct is_same<A,A> : public true_type {};
 
     // is_const
-    template <typename T> 
-    struct is_const_value : public false_type {};
+    template <typename T> struct is_const_value : public false_type {};
+    template <typename T> struct is_const_value<const T*> : public true_type {};
+    template <typename T> struct is_const_value<const volatile T*> : public true_type {};
+    
+    template <typename T> struct is_const : public is_const_value<T*> {};
+    template <typename T> struct is_const<T&> : public false_type {};
 
-    template <typename T>
-    struct is_const_value<const T*> : public true_type {};
+    // is_volatile
+    template <typename T> struct is_volatile_value : public false_type {};
+    template <typename T> struct is_volatile_value<volatile T*> : public true_type {};
+    template <typename T> struct is_volatile_value<const volatile T*> : public true_type {};
 
-    template <typename T>
-    struct is_const : public is_const_value<T*> {};
-
-    template <typename T>
-    struct is_const<T&> : public false_type {};
+    template <typename T> struct is_volatile : public sp::is_volatile_value<T*> {};
+    template <typename T> struct is_volatile : public sp::false_type {};
 
     // is_reference
-    template <typename T>
-    struct is_reference : public false_type {};
-
-    template <typename T>
-    struct is_reference<T&> : public true_type {};
+    template <typename T> struct is_reference : public false_type {};
+    template <typename T> struct is_reference<T&> : public true_type {};
 
     // is_function
     template <typename>
@@ -122,9 +122,9 @@ namespace sp
     struct is_function<ReturnValue(ArgPack..., ...)> : public true_type {};
 
     // remove_const
-    template <typename T> struct remove_const { typedef T type; };
-    template <typename T> struct remove_const<const T> { typedef T type; };
-    template <typename T> struct remove_const<const T[]> { typedef T type[]; };
+    template <typename T>           struct remove_const { typedef T type; };
+    template <typename T>           struct remove_const<const T> { typedef T type; };
+    template <typename T>           struct remove_const<const T[]> { typedef T type[]; };
     template <typename T, size_t N> struct remove_const<const T[N]> { typedef T type[N]; };
 
     // remove_volatile
@@ -141,11 +141,8 @@ namespace sp
     template <typename T> struct add_reference_impl { typedef T&   type; };
     template <typename T> struct add_reference_impl<T&> { typedef T&   type; };
     template <>           struct add_reference_impl<void> { typedef void type; };
-#if defined(_MSC_VER) && (_MSC_VER <= 1600) // VS2010 and earlier mistakenly report: "cannot add a reference to a zero-sized array." Actually they are allowed, but there's nothing we can do about it under VS2010 and earlier.
-    template <typename T> struct add_reference_impl<T[0]> { typedef T    type; };
-#endif
-    template <typename T> struct add_reference { typedef typename add_reference_impl<T>::type type; };
 
+    template <typename T> struct add_reference { typedef typename add_reference_impl<T>::type type; };
 
     // remove_reference
     template <typename T> struct remove_reference { typedef T type; };
@@ -167,5 +164,9 @@ namespace sp
 }
 
 #include <internal\type_fundamental.h>
+#include <internal\type_transformation.h>
+#include <internal\type_properties.h>
+#include <internal\type_compound.h>
+#include <internal\type_pod.h>
 
 #endif

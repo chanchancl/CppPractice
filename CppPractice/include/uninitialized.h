@@ -15,7 +15,7 @@ namespace sp
     {
         ForwardIter cur = result;
         for (; first != last; ++first, ++cur)
-            Construct(cur, *first);
+            Construct(&*cur, *first);
         return cur;
     }
 

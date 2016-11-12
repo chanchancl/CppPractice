@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\internal">
+      <UniqueIdentifier>{bcbdd827-7fc4-417b-bab6-503f4ed14ecd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\algorithm.h">
@@ -31,6 +34,24 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\vector.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\internal\type_fundamental.h">
+      <Filter>头文件\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\internal\type_transformation.h">
+      <Filter>头文件\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\internal\type_properties.h">
+      <Filter>头文件\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\internal\type_compound.h">
+      <Filter>头文件\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\internal\type_pod.h">
+      <Filter>头文件\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\iterator.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

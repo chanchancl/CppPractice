@@ -152,6 +152,12 @@
     <ClInclude Include="include\algorithm.h" />
     <ClInclude Include="include\array.h" />
     <ClInclude Include="include\construct.h" />
+    <ClInclude Include="include\internal\type_compound.h" />
+    <ClInclude Include="include\internal\type_fundamental.h" />
+    <ClInclude Include="include\internal\type_pod.h" />
+    <ClInclude Include="include\internal\type_properties.h" />
+    <ClInclude Include="include\internal\type_transformation.h" />
+    <ClInclude Include="include\iterator.h" />
     <ClInclude Include="include\type_traits.h" />
     <ClInclude Include="include\uninitialized.h" />
     <ClInclude Include="include\vector.h" />
