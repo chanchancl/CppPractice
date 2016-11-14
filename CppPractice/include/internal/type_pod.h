@@ -70,4 +70,8 @@ namespace sp
     template <typename T>
     struct is_POD_type : public bool_constant<type_pod<typename remove_cv<T>::type>::is_POD_type::value> {};
 
+    // is_trivial
+    template <typename T>
+    struct is_trivial : public bool_constant< has_trivial_copy_constructor<T>::value > {};
+
 }

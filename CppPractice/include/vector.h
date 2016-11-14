@@ -114,7 +114,8 @@ namespace sp
         {
             if (_end != _end_capacity)
             {
-                Construct(_end, value);
+                ++a;
+                construct(_end, value);
                 ++_end;
             }
             else
@@ -130,7 +131,7 @@ namespace sp
             size_type n = position - begin();
             if (_end != _end_capacity && position == _end)
             {
-                Construct(_end, value);
+                construct(_end, value);
                 ++_end;
             }
 
@@ -155,7 +156,7 @@ namespace sp
                     // 可以插入到尾部
                     iterator end = position + n;
                     for (; _end != end; ++_end)
-                        sp::Construct(_end, value);
+                        sp::construct(_end, value);
                 }
                 else
                     insert_fill(position, n, value);
@@ -163,15 +164,21 @@ namespace sp
                 return _begin + old_n;
             }
         }
+
+        long long a;
+        int  b;
         void insert_aux(iterator position, const value_type& x)
         {
             if (_end != _end_capacity)
             {
-                Construct(_end, *(_end - 1));
+                construct(_end, *(_end - 1));
                 value_type x_copy = x;
 
                 /*iterator cur1 = _end-2;
                 iterator cur2 = _end-1;*/
+
+                a += (_end - 2) - position ;
+                //memmove(&*(position + 1), &*position, sizeof(value_type)*((_end - position)-1));
                 copy_backward(position, _end - 2, _end - 1);
                /* for (; cur2 != position; --cur1, --cur2)
                     *cur2 = *cur1;*/
@@ -181,6 +188,7 @@ namespace sp
             }
             else
             {
+                ++b;
                 const size_type old_size = size();
                 const size_type len = old_size != 0 ? VECTOR_INCREASE_FACTOR * old_size : 1;
 
@@ -195,7 +203,7 @@ namespace sp
                 new_end = uninitialized_copy(position, end(), new_end);
 
                 // 析构
-                Destroy(_begin, _end);
+                destroy(_begin, _end);
 
                 // 释放内存
                 if (pointer(_begin))
@@ -235,7 +243,7 @@ namespace sp
                 new_end = uninitialized_copy(position, end(), new_end);
 
                 // 析构
-                Destroy(_begin, _end);
+                destroy(_begin, _end);
 
                 // 释放内存
                 if (pointer(_begin))
@@ -250,7 +258,7 @@ namespace sp
         void pop_back()
         {
             --_end;
-            Destroy(_end);
+            destroy(_end);
         }
 
         iterator erase(iterator position)
@@ -258,34 +266,36 @@ namespace sp
             if (last + 1 != end())
                 copy(position + 1, end(), position);
             --_end;
-            Destroy(_end);
+            destroy(_end);
             return position;
         }
 
         iterator erase(iterator first, iterator last)
         {
             iterator i = copy(last, _end, first);
-            Destroy(i, _end);
+            destroy(i, _end);
             _end = _end - (last - first);
             return first;
         }
 
         void clear()
         {
-            sp::Destroy(_begin, _end);
+            sp::destroy(_begin, _end);
             _end = _begin;
         }
 
         // vector[5] = xxx;
-        reference operator[](size_t index)
+        reference operator[](difference_type index)
         {
+            auto temp = _begin + index;
             return *(_begin + index);
         }
+
         // xxx =  vector[5];
-        const value_type operator[](size_t index) const
+        const value_type operator[](difference_type index) const
         {
             // 0 <= index <= _Size-1;
-            return return *(_begin + index);
+            return *(_begin + index);
         }
     };
 
