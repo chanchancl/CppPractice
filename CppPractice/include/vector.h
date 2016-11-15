@@ -8,7 +8,6 @@
 
 
 // 越写越乱了。。。尴尬 
-// 感觉差不多了。
 
 namespace sp
 {
@@ -57,6 +56,15 @@ namespace sp
             _begin = nullptr;
         }
 
+        inline size_type capacity()
+        {
+            return _end_capacity - _begin;
+        }
+
+        inline size_type size()
+        {
+            return _end - _begin;
+        }
 
     protected:
         iterator _begin;
@@ -69,18 +77,14 @@ namespace sp
     
     template<class _T>
     class vector : public vector_base<_T>
-    {   
-        typedef vector<_T>                           this_type;
-        typedef vector_base<_T>                      base_type;
-
-    public: 
-        typedef base_type::iterator                  iterator;
-        typedef base_type::const_iterator            const_iterator;
-        typedef sp::reverse_iterator<iterator>       reverse_iterator;
-        typedef sp::reverse_iterator<const_iterator> const_reverse_iterator;
-        typedef base_type::size_type                 size_type;
-        typedef base_type::difference_type           difference_type;
-        
+    {
+    public:
+        typedef vector<_T>                  this_type;
+        typedef vector_base<_T>             base_type;
+        typedef base_type::iterator         iterator;
+        typedef base_type::const_iterator   const_iterator;
+        typedef base_type::size_type        size_type;
+        typedef base_type::difference_type  difference_type;
 
     public:
         vector(): vector_base() {}
@@ -88,120 +92,56 @@ namespace sp
         // 这里没有拷贝构造函数，这个行为由vector_base<_T>来完成
         // vector<_T>默认的浅拷贝，会调用vector_base<_T>的拷贝构造函数
         
-        iterator       begin()
+        inline iterator begin()
         {
             return _begin;
         }
-        const_iterator begin() const
-        {
-            return _begin;
-        }
-        const_iterator cbegin() const
-        {
-            return _begin;
-        }
-
-        iterator       end()
+        inline iterator end()
         {
             return _end;
         }
-        const_iterator end() const
+        inline const_iterator begin() const
         {
-            return _end;
+            return _begin;
         }
-        const_iterator cend() const
+        inline const_iterator end() const
         {
             return _end;
         }
 
-        reverse_iterator       rbegin()
-        {
-            return reverse_iterator(_end);
-        }
-        const_reverse_iterator rbegin() const
-        {
-            return const_reverse_iterator(_end);
-        }
-        const_reverse_iterator crbegin() const
-        {
-            return const_reverse_iterator(_end);
-        }
 
-        reverse_iterator       rend()
-        {
-            return reverse_iterator(_begin);
-        }
-        const_reverse_iterator rend() const
-        {
-            return reverse_iterator(_begin);
-        }
-        const_reverse_iterator crend() const
-        {
-            return reverse_iterator(_begin);
-        }
-
-        bool      empty() const
-        {
-            return _begin == _end;
-        }
-        size_type size() const
-        {
-            return _end - _begin;
-        }
-        size_type capacity() const
-        {
-            return _end_capacity - _begin;
-        }
-
-        reference       operator[](size_type n)
-        {
-            return *(_begin + n);
-        }
-        const_reference operator[](size_type n) const
-        {
-            return *(_begin + n);
-        }
-
-
-        void      push_back(const value_type& value)
+        void push_back(const value_type& value)
         {
             if (_end != _end_capacity)
-                construct(_end++, value);
+            {
+                ++a;
+                construct(_end, value);
+                ++_end;
+            }
             else
                 insert(_end, value);
         }
-        reference push_back() 
+        inline void push_back() 
         {
-            if (_end != _end_capacity)
-                construct(_end++, value);
-            else
-                insert(_end, value);
-
-            return *(_end - 1);
-        }
-        void      pop_back()
-        {
-            --_end;
-            destroy(_end);
+            push_back(value_type());
         }
 
         iterator insert(iterator position, const value_type& value)
         {
             size_type n = position - begin();
             if (_end != _end_capacity && position == _end)
-                construct(_end++, value);
+            {
+                construct(_end, value);
+                ++_end;
+            }
+
             else
                 insert_aux(position, value);
             return begin() + n;
         }
-        iterator insert(iterator position)
+        inline iterator insert(iterator position)
         {
-            size_type n = position - begin();
-            if (_end != _end_capacity && position == _end)
-                construct(_end++, value_type());
-            else
-                insert_aux(position, value_type());
-            return begin() + n;
+            insert(position, value_type());
         }
         iterator insert(iterator position, size_type n, const value_type& value)
         {
@@ -225,29 +165,6 @@ namespace sp
             }
         }
 
-        iterator erase(iterator position)
-        {
-            if (last + 1 != end())
-                copy(position + 1, end(), position);
-            --_end;
-            destroy(_end);
-            return position;
-        }
-        iterator erase(iterator first, iterator last)
-        {
-            iterator i = copy(last, _end, first);
-            destroy(i, _end);
-            _end = _end - (last - first);
-            return first;
-        }
-
-        void clear()
-        {
-            sp::destroy(_begin, _end);
-            _end = _begin;
-        }
-
-    protected:
         void insert_aux(iterator position, const value_type& x)
         {
             if (_end != _end_capacity)
@@ -329,8 +246,48 @@ namespace sp
             }
         }
 
-       
+        void pop_back()
+        {
+            --_end;
+            destroy(_end);
+        }
 
+        iterator erase(iterator position)
+        {
+            if (last + 1 != end())
+                copy(position + 1, end(), position);
+            --_end;
+            destroy(_end);
+            return position;
+        }
+
+        iterator erase(iterator first, iterator last)
+        {
+            iterator i = copy(last, _end, first);
+            destroy(i, _end);
+            _end = _end - (last - first);
+            return first;
+        }
+
+        void clear()
+        {
+            sp::destroy(_begin, _end);
+            _end = _begin;
+        }
+
+        // vector[5] = xxx;
+        reference operator[](difference_type index)
+        {
+            auto temp = _begin + index;
+            return *(_begin + index);
+        }
+
+        // xxx =  vector[5];
+        const value_type operator[](difference_type index) const
+        {
+            // 0 <= index <= _Size-1;
+            return *(_begin + index);
+        }
     };
 
 }
