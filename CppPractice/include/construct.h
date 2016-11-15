@@ -52,7 +52,6 @@ namespace sp
     template <class ForwardIter>
     inline void destroy(ForwardIter first, ForwardIter last)
     {
-        
         for (; first != last; ++first)
             destroy(first);
     }
@@ -62,25 +61,21 @@ namespace sp
     template <class InputIter, class OutIter>
     inline OutIter copy(InputIter first, InputIter last, OutIter result)
     {
-        typedef typename iterator_traits<InputIter>::value_type valute_type;
+        typedef typename iterator_traits<InputIter>::value_type value_type;
 
-        ::memcpy(&*result, &first, sizeof(value_type)*(last - first));
+        ::memcpy(&*result, &*first, sizeof(value_type)*(last - first));
 
-        /*ptrdiff_t n = last - first;
-        for (; n > 0; --n, ++first, ++result)
-        *result = *first;*/
-        return result;
+        return result + (last-first);
     }
 
     // copy_backward
     // 如果数据区重叠，可以用 copy_backward
     template <class InputIter, class OutIter>
-    inline OutIter copy_backward(InputIter first, InputIter last, OutIter result)
+    inline OutIter copy_backward(InputIter first, InputIter last, OutIter resultEnd)
     {
         typedef typename iterator_traits<InputIter>::value_type value_type;
 
-        ::memmove((result - (last - first)), &*first, sizeof(value_type)*(last - first));
-        return result;
+        return (OutIter)::memmove(&*(resultEnd - (last - first)), &*first, sizeof(value_type)*(last - first));
     }
 
     template <class InputIter, class T>

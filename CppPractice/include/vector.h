@@ -165,30 +165,21 @@ namespace sp
             }
         }
 
-        long long a;
-        int  b;
         void insert_aux(iterator position, const value_type& x)
         {
             if (_end != _end_capacity)
             {
+                // _end 为 uninitialized，使用 _end-1 来初始化它
                 construct(_end, *(_end - 1));
                 value_type x_copy = x;
 
-                /*iterator cur1 = _end-2;
-                iterator cur2 = _end-1;*/
-
-                a += (_end - 2) - position ;
-                //memmove(&*(position + 1), &*position, sizeof(value_type)*((_end - position)-1));
-                copy_backward(position, _end - 2, _end - 1);
-               /* for (; cur2 != position; --cur1, --cur2)
-                    *cur2 = *cur1;*/
+                copy_backward(position, _end - 1, _end );
 
                 *position = x_copy;
                 ++_end;
             }
             else
             {
-                ++b;
                 const size_type old_size = size();
                 const size_type len = old_size != 0 ? VECTOR_INCREASE_FACTOR * old_size : 1;
 
@@ -200,7 +191,7 @@ namespace sp
                 *new_end = x;
                 ++new_end;
 
-                new_end = uninitialized_copy(position, end(), new_end);
+                new_end = uninitialized_copy(position, _end, new_end);
 
                 // 析构
                 destroy(_begin, _end);
@@ -240,7 +231,7 @@ namespace sp
 
                 new_end = fill(_new_end, new_end + n, value);
 
-                new_end = uninitialized_copy(position, end(), new_end);
+                new_end = uninitialized_copy(position, _end, new_end);
 
                 // 析构
                 destroy(_begin, _end);
