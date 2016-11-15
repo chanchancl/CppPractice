@@ -52,26 +52,26 @@ namespace sp
 
     // has_trivial_default_constructor
     template <typename T>
-    struct has_trivial_default_constructor : public bool_constant<type_pod<typename remove_cv<T>::type>::has_trivial_default_constructor::value> {};
+    struct has_trivial_default_constructor : public type_pod<typename remove_cv<T>::type>::has_trivial_default_constructor {};
 
     // has_trivial_copy_constructor
     template <typename T>
-    struct has_trivial_copy_constructor : public bool_constant<type_pod<typename remove_cv<T>::type>::has_trivial_copy_constructor::value> {};
+    struct has_trivial_copy_constructor : public type_pod<typename remove_cv<T>::type>::has_trivial_copy_constructor {};
 
     // has_trivial_copy_constructor
     template <typename T>
-    struct has_trivial_assignment_operator : public bool_constant<type_pod<typename remove_cv<T>::type>::has_trivial_assignment_operator::value> {};
+    struct has_trivial_assignment_operator : public type_pod<typename remove_cv<T>::type>::has_trivial_assignment_operator {};
 
     // has_trivial_copy_constructor
     template <typename T>
-    struct has_trivial_destructor : public bool_constant<type_pod<typename remove_cv<T>::type>::has_trivial_destructor::value> {};
+    struct has_trivial_destructor : public type_pod<typename remove_cv<T>::type>::has_trivial_destructor {};
 
     // has_trivial_copy_constructor
     template <typename T>
-    struct is_POD_type : public bool_constant<type_pod<typename remove_cv<T>::type>::is_POD_type::value> {};
+    struct is_pod : public type_pod<typename remove_cv<T>::type>::is_POD_type {};
 
     // is_trivial
     template <typename T>
-    struct is_trivial : public bool_constant< has_trivial_copy_constructor<T>::value > {};
+    struct is_trivial : public has_trivial_copy_constructor<T> {};
 
 }
