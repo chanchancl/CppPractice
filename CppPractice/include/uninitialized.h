@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _UNINITIALIZED_H_
+#define _UNINITIALIZED_H_
+
 #include <iterator.h>
 #include <construct.h>
 #include <type_traits.h>
@@ -41,3 +44,4 @@ namespace sp
 
 }
 
+#endif // !_UNINITIALIZED_H_

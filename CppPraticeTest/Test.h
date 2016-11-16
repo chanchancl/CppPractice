@@ -16,9 +16,9 @@ void _EXCEPT(bool bexpression, std::string expression, std::string file, long li
 #define EXCEPT(expression) _EXCEPT((expression), #expression , __FILE__, __LINE__);
 
 
-
-void test_type_traits();
-
+// Test Functions
+void TestType_Traits();
+void TestVector();
 
 
 #endif

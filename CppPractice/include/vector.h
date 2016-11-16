@@ -14,29 +14,29 @@ namespace sp
 {
 #define VECTOR_INCREASE_FACTOR (2)
 
-    template<class _T>
+    template<class T>
     class vector_base
     {
     public:
-        typedef _T            value_type;
-        typedef _T*           pointer;
-        typedef const _T*     const_pointer;
-        typedef _T&           reference;
-        typedef const _T&     const_reference;
-        typedef size_t        size_type;
-        typedef ptrdiff_t     difference_type;
-        typedef pointer       iterator;
-        typedef const pointer const_iterator;
+        typedef T          value_type;
+        typedef T*         pointer;
+        typedef const T*   const_pointer;
+        typedef T&         reference;
+        typedef const T&   const_reference;
+        typedef size_t     size_type;
+        typedef ptrdiff_t  difference_type;
+        typedef T*         iterator;
+        typedef const T*   const_iterator;
 
     public:
         vector_base()
         {
             _begin = _end = _end_capacity = nullptr;
         }
-        vector_base(size_t size, value_type dt) 
+        vector_base(size_type size, const value_type& dt)
         {
             _end = _begin = new value_type[size];
-            for (int i = 0; i < size; i++)
+            for (size_type i = 0; i < size; i++)
             {
                 *_end = dt;
                 ++_end;
@@ -67,11 +67,11 @@ namespace sp
         int count;
     };
     
-    template<class _T>
-    class vector : public vector_base<_T>
+    template<class T>
+    class vector : public vector_base<T>
     {   
-        typedef vector<_T>                           this_type;
-        typedef vector_base<_T>                      base_type;
+        typedef vector<T>                           this_type;
+        typedef vector_base<T>                      base_type;
 
     public: 
         typedef base_type::iterator                  iterator;
@@ -85,8 +85,8 @@ namespace sp
     public:
         vector(): vector_base() {}
         vector(size_type size , value_type dt) : base_type(size,dt) {}
-        // 这里没有拷贝构造函数，这个行为由vector_base<_T>来完成
-        // vector<_T>默认的浅拷贝，会调用vector_base<_T>的拷贝构造函数
+        // 这里没有拷贝构造函数，这个行为由vector_base<T>来完成
+        // vector<T>默认的浅拷贝，会调用vector_base<T>的拷贝构造函数
         
         iterator       begin()
         {
@@ -332,6 +332,22 @@ namespace sp
        
 
     };
+
+    // return true if v1 equal v2,otherwise return false
+    template<typename T>
+    bool operator==(const vector<T>& v1, const vector<T>& v2)
+    {
+        if (v1.size() != v2.size())
+            return false;
+        auto it1 = v1.begin();
+        auto it2 = v2.begin();
+        // v1.size() == v2.size()
+        for (; it1 != v1.end() /*&& it2 != v2.end()*/; ++it1, ++it2)
+            if (*it1 != *it2)
+                return false;
+        return true;
+    }
+
 
 }
 #endif

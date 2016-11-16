@@ -24,7 +24,7 @@ struct Pod2
 DECLARE_POD_TYPE(Pod1);
 DECLARE_POD_TYPE(Pod2);
 
-void test_type_traits()
+void TestType_Traits()
 {
     using namespace sp;
 

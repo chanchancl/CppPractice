@@ -8,8 +8,9 @@ int error = 0;
 
 int main()
 {
-    test_type_traits();
-
+    TestType_Traits();
+    TestVector();
+    
 
     return 0;
 }
