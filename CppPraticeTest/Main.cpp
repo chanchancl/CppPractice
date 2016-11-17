@@ -10,7 +10,7 @@ int main()
 {
     TestType_Traits();
     TestVector();
-    
+    TestArray();
 
     return 0;
 }

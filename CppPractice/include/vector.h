@@ -87,6 +87,34 @@ namespace sp
         vector(size_type size , value_type dt) : base_type(size,dt) {}
         // 这里没有拷贝构造函数，这个行为由vector_base<T>来完成
         // vector<T>默认的浅拷贝，会调用vector_base<T>的拷贝构造函数
+        vector(const this_type& oth)
+        {
+            _begin = new value_type[oth.capacity()];
+            _end = _begin + oth.size();
+            _end_capacity = _begin + oth.capacity();
+            sp::copy(oth._begin, oth._end, _begin);
+        }
+
+        this_type& operator=(const this_type& oth)
+        {
+            if (this != &oth)
+            {
+                if (capacity() > oth.size())
+                {
+                    copy(oth._begin, oth._end, _begin);
+                    _end = _begin + oth.size();
+                }
+                else
+                {
+                    base_type::dealloc();
+                    _begin = new value_type[oth.capacity()];
+                    _end = _begin + oth.size();
+                    _end_capacity = _begin + oth.capacity();
+                    sp::copy(oth._begin, oth._end, _begin);
+                }
+            }
+            return *this;
+        }
         
         iterator       begin()
         {
@@ -328,8 +356,6 @@ namespace sp
                 _end_capacity = _begin + len;
             }
         }
-
-       
 
     };
 

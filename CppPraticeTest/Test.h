@@ -19,6 +19,6 @@ void _EXCEPT(bool bexpression, std::string expression, std::string file, long li
 // Test Functions
 void TestType_Traits();
 void TestVector();
-
+void TestArray();
 
 #endif

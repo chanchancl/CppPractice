@@ -78,16 +78,123 @@ namespace sp
         return (OutIter)::memmove(&*(resultEnd - (last - first)), &*first, sizeof(value_type)*(last - first));
     }
 
-    template <class InputIter, class T>
-    inline InputIter fill(InputIter first, InputIter last, const T& value)
+    template <bool bIsScalar>
+    struct fill_imp
     {
+        template <typename ForwardIter, typename T>
+        static void do_fill(ForwardIter first, ForwardIter last, const T& value)
+        {
+            for (; first != last; ++first)
+                *first = value;
+        }
+    };
 
-        for (; first != last; ++first)
-            construct(first, value);
+    template <>
+    struct fill_imp<true>
+    {
+        template <typename ForwardIter, typename T>
+        static void do_fill(ForwardIter first, ForwardIter last, const T& value)
+        {
+            typedef typename sp::iterator_traits<ForwardIter>::value_type value_type;
+            for (const T temp = value; first != last; ++first)
+            {
+                (void)temp;
+                *first = static_cast<value_type>(temp);
+            }
+        }
+    };
 
-        return first;
+    template <class InputIter, class T>
+    inline void fill(InputIter first, InputIter last, const T& value)
+    {
+        return fill_imp<is_scalar<T>::value>::do_fill(first, last, value);
     }
 
+    inline void fill(char* first, char* last, const char& c) // It's debateable whether we should use 'char& c' or 'char c' here.
+    {
+        memset(first, (unsigned char)c, (size_t)(last - first));
+    }
+
+    inline void fill(char* first, char* last, const int c) // This is used for cases like 'fill(first, last, 0)'.
+    {
+        memset(first, (unsigned char)c, (size_t)(last - first));
+    }
+
+    inline void fill(unsigned char* first, unsigned char* last, const unsigned char& c)
+    {
+        memset(first, (unsigned char)c, (size_t)(last - first));
+    }
+
+    inline void fill(unsigned char* first, unsigned char* last, const int c)
+    {
+        memset(first, (unsigned char)c, (size_t)(last - first));
+    }
+
+    inline void fill(signed char* first, signed char* last, const signed char& c)
+    {
+        memset(first, (unsigned char)c, (size_t)(last - first));
+    }
+
+    inline void fill(signed char* first, signed char* last, const int c)
+    {
+        memset(first, (unsigned char)c, (size_t)(last - first));
+    }
+
+    template <bool bIsScalar>
+    struct fill_n_imp
+    {
+        template <typename OutputIter, typename Size, typename T>
+        static OutputIter do_fill(OutputIter first, Size n, const T& value)
+        {
+            for (; n-- > 0; ++first)
+                *first = value;
+            return first;
+        }
+    };
+    template <>
+    struct fill_n_imp<true>
+    {
+        template <typename OutputIter, typename Size, typename T>
+        static OutputIter do_fill(OutputIter first, Size n, const T& value)
+        {
+            typedef typename sp::iterator_traits<OutputIter>::value_type value_type;
+
+            for (const T temp = value; n-- > 0; ++first)
+                *first = static_cast<value_type>(temp);
+            return first;
+        }
+    };
+
+
+    template <typename OutputIter, typename Size, typename T>
+    OutputIter fill_n(OutputIter first, Size n, const T& value)
+    {
+        return fill_n_imp< is_scalar<T>::value>::do_fill(first, n, value);
+    }
+
+    template <typename Size>
+    inline char* fill_n(char* first, Size n, const char& c)
+    {
+        return (char*)memset(first, (char)c, (size_t)n) + n;
+    }
+
+    template <typename Size>
+    inline unsigned char* fill_n(unsigned char* first, Size n, const unsigned char& c)
+    {
+        return (unsigned char*)memset(first, (unsigned char)c, (size_t)n) + n;
+    }
+
+    template <typename Size>
+    inline signed char* fill_n(signed char* first, Size n, const signed char& c)
+    {
+        return (signed char*)memset(first, (signed char)c, n) + (size_t)n;
+    }
+
+    template <typename Size>
+    inline bool* fill_n(bool* first, Size n, const bool& b)
+    {
+        return (bool*)memset(first, (char)b, n) + (size_t)n;
+    }
 
 
 }
