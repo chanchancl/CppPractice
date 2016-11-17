@@ -3,7 +3,7 @@
 #include <vector.h>
 #include "Test.h"
 
-#define TEST_OBJECT_OUTPUT 1
+#define TEST_OBJECT_OUTPUT 0
 
 class TestObject
 {
@@ -37,10 +37,7 @@ void TestVector()
     using namespace sp;
     int i;
 
-    sp::vector<TestObject> vec4;
-    for (i = 0; i < 100; ++i)
-        vec4.push_back(TestObject());
-
+    Reset("vector");
 
     vector<int> vec1;
     vector<int> vec2(100, 2);
@@ -102,6 +99,13 @@ void TestVector()
     EXCEPT(vec1 == vec2);
 
     // 
+    sp::vector<TestObject> vec4;
+    for (i = 0; i < 100; ++i)
+        vec4.push_back(TestObject());
+
+    EXCEPT(TestObject::ConstructCount == 100);
+
+    Report();
 
     int aaa = 5;
 }
