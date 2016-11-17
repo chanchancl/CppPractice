@@ -25,10 +25,10 @@ namespace sp
         {
             ForwardIter cur = result;
 
-            for (; first != last; ++first, ++result)
-                sp::construct(cur, first);
+            for (; first != last; ++first, ++cur)
+                sp::construct(cur, *first);
 
-            return result;
+            return cur;
         }
     }
 

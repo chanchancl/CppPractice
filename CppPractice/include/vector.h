@@ -5,7 +5,7 @@
 
 #include "algorithm.h"
 #include "uninitialized.h"
-
+#include <stdlib.h>
 
 // 越写越乱了。。。尴尬 
 // 感觉差不多了。
@@ -53,7 +53,10 @@ namespace sp
         void dealloc()
         {
             if (_begin)
-                delete[] _begin;
+            {
+                destroy(_begin, _end);
+                free(_begin);
+            }
             _begin = nullptr;
         }
 
@@ -181,6 +184,29 @@ namespace sp
             return _end_capacity - _begin;
         }
 
+        // data front back 并不确保数据的有效性，
+        // 访问前需要确认一下
+        pointer    data() const
+        {
+            return _begin;
+        }
+        reference  front()
+        {
+            return *_begin;
+        }
+        value_type front() const
+        {
+            return *_begin;
+        }
+        reference  back()
+        {
+            return *(_end - 1);
+        }
+        value_type back() const
+        {
+            return *(_end - 1);
+        }
+
         reference       operator[](size_type n)
         {
             return *(_begin + n);
@@ -189,7 +215,6 @@ namespace sp
         {
             return *(_begin + n);
         }
-
 
         void      push_back(const value_type& value)
         {
@@ -200,10 +225,11 @@ namespace sp
         }
         reference push_back() 
         {
+            typedef typename iterator_traits<iterator>::value_type value_type;
             if (_end != _end_capacity)
-                construct(_end++, value);
+                construct(_end++, value_type());
             else
-                insert(_end, value);
+                insert(_end, value_type());
 
             return *(_end - 1);
         }
@@ -282,11 +308,10 @@ namespace sp
             {
                 // _end 为 uninitialized，使用 _end-1 来初始化它
                 construct(_end, *(_end - 1));
-                value_type x_copy = x;
 
                 copy_backward(position, _end - 1, _end );
-
-                *position = x_copy;
+                destroy(position);
+                construct(position, x);
                 ++_end;
             }
             else
@@ -294,22 +319,23 @@ namespace sp
                 const size_type old_size = size();
                 const size_type len = old_size != 0 ? VECTOR_INCREASE_FACTOR * old_size : 1;
 
-                iterator new_begin = new value_type[len];
+                // 通过 TestObject 测试发现，这里不能用 new，因为会分配新对象，并调用构造函数
+                //iterator new_begin = new value_type[len];
+                iterator new_begin = (iterator)malloc(sizeof(value_type) * len);
                 iterator new_end = new_begin;
 
                 new_end = uninitialized_copy(_begin, position, new_end);
 
-                *new_end = x;
+                construct(new_end, x);
                 ++new_end;
+                //*new_end = x;
+                //++new_end;
 
                 new_end = uninitialized_copy(position, _end, new_end);
 
                 // 析构
-                destroy(_begin, _end);
-
                 // 释放内存
-                if (pointer(_begin))
-                    delete[] pointer(_begin);
+                dealloc();
 
                 _begin = new_begin;
                 _end = new_end;
@@ -345,11 +371,8 @@ namespace sp
                 new_end = uninitialized_copy(position, _end, new_end);
 
                 // 析构
-                destroy(_begin, _end);
-
                 // 释放内存
-                if (pointer(_begin))
-                    delete[] pointer(_begin);
+                dealloc();
 
                 _begin = new_begin;
                 _end = new_end;
@@ -365,12 +388,7 @@ namespace sp
     {
         if (v1.size() != v2.size())
             return false;
-        auto it1 = v1.begin();
-        auto it2 = v2.begin();
-        // v1.size() == v2.size()
-        for (; it1 != v1.end() /*&& it2 != v2.end()*/; ++it1, ++it2)
-            if (*it1 != *it2)
-                return false;
+        sp::equal(v1.begin(), v1.end(), v2.begin());
         return true;
     }
 
