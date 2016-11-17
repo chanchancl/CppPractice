@@ -16,6 +16,12 @@ void _EXCEPT(bool bexpression, std::string expression, std::string file, long li
 
 #define EXCEPT(expression) _EXCEPT((expression), #expression , __FILE__, __LINE__);
 
+//
+// when you add a new Unit Test.
+//   call Reset( "TestName");
+// and at the end.
+//   call Report();
+//
 void Reset(const char*);
 
 void Report();
