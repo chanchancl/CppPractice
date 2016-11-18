@@ -8,14 +8,36 @@
 class TestObject
 {
 public:
-    TestObject() : _count(ConstructCount++)
+    TestObject()
     {
+        _count = ConstructCount++;
+        ++DefaultConstruct;
+        ++Alive;
         #if TEST_OBJECT_OUTPUT
             std::cout << "Test Object :            " << _count << " Construct" << std::endl;
         #endif
     }
+    TestObject(const TestObject& obj)
+    {
+        _count = obj._count;
+        ++ConstructCount;
+        ++CopyConstruct;
+        ++Alive;
+    }
+    TestObject& operator=(const TestObject& obj)
+    {
+        ++AssignCopyConstruct;
+
+        if (this != &obj)
+            _count = obj._count;
+
+        return *this;
+    }
+
+
     ~TestObject()
     {
+        --Alive;
         ++DestroyCount;
         #if TEST_OBJECT_OUTPUT
             std::cout << "Test Object : " << _count << " Destroy" << std::endl;
@@ -23,11 +45,19 @@ public:
     }
 
     int _count;
+    static int Alive;
+    static int DefaultConstruct;
+    static int CopyConstruct;
+    static int AssignCopyConstruct;
     static int ConstructCount;
     static int DestroyCount;
 };
 
 // 定义static class member
+int TestObject::Alive = 0;
+int TestObject::DefaultConstruct = 0;
+int TestObject::CopyConstruct = 0;
+int TestObject::AssignCopyConstruct = 0;
 int TestObject::ConstructCount = 0;
 int TestObject::DestroyCount = 0;
 
@@ -41,7 +71,7 @@ void TestVector()
 
     vector<int> vec1;
     vector<int> vec2(100, 2);
-    vector<int> vec3 = vec2;
+    vector<int> vec3(vec2);
     
 
     vector<int>::iterator it;
@@ -82,6 +112,11 @@ void TestVector()
     vec2 = vec3;
     EXCEPT(vec1 == vec2);
 
+    for (auto it = vec3.begin(); it != vec3.end(); ++it)
+        *it = *it + 1;
+    for (i = 0; i < (int)vec3.size(); ++i)
+        EXCEPT(vec3[i] == 3);
+
     vec1.clear();
     vec2.clear();
     for (i = 0; i < 100; ++i)
@@ -103,9 +138,18 @@ void TestVector()
     for (i = 0; i < 100; ++i)
         vec4.push_back(TestObject());
 
-    EXCEPT(TestObject::ConstructCount == 100);
+    // 此时有100个对象存活，
+    // 析构函数的调用次数应比 构造函数少100次
+    EXCEPT(TestObject::Alive == 100);
+    EXCEPT(TestObject::ConstructCount == TestObject::DefaultConstruct 
+           + TestObject::AssignCopyConstruct + TestObject::CopyConstruct);
+    EXCEPT(TestObject::ConstructCount == TestObject::DestroyCount + 100);
+
+    vec4.clear();
+
+    // 对象全部销毁
+    EXCEPT(TestObject::Alive == 0);
+    EXCEPT(TestObject::ConstructCount == TestObject::DestroyCount);
 
     Report();
-
-    int aaa = 5;
 }
