@@ -365,9 +365,7 @@ namespace sp
                 iterator new_end = new_begin;
 
                 new_end = uninitialized_copy(_begin, position, new_end);
-
                 new_end = fill(_new_end, new_end + n, value);
-
                 new_end = uninitialized_copy(position, _end, new_end);
 
                 // Îö¹¹
