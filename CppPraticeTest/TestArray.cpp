@@ -7,8 +7,6 @@ void TestArray()
     using namespace sp;
     int i;
 
-    Reset("array");
-
     array<int, 5> a = { 0, 1, 2, 3, 4 };
     array<int, 5> b = { 1, 1, 1, 1, 1 };
     array<int, 5> c;
@@ -23,5 +21,4 @@ void TestArray()
         b[i] = a[i];
     EXCEPT(b == a);
     
-    Report();
 }

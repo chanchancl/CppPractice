@@ -28,8 +28,6 @@ void TestType_Traits()
 {
     using namespace sp;
 
-    Reset("type_traits");
-
     // base type_traits
     {
         // integral_constant 
@@ -248,8 +246,6 @@ void TestType_Traits()
 
         
     }
-
-    Report();
 }
 
 

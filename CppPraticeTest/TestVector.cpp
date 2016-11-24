@@ -67,8 +67,6 @@ void TestVector()
     using namespace sp;
     int i;
 
-    Reset("vector");
-
     vector<int> vec1;
     vector<int> vec2(100, 2);
     vector<int> vec3(vec2);
@@ -151,5 +149,4 @@ void TestVector()
     EXCEPT(TestObject::Alive == 0);
     EXCEPT(TestObject::ConstructCount == TestObject::DestroyCount);
 
-    Report();
 }

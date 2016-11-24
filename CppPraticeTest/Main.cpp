@@ -9,10 +9,14 @@ int error = 0;
 int main()
 {
     using namespace std;
-    cout << setw(20)<< "" << "pass/error/total" << endl;
-    TestType_Traits();
-    TestVector();
-    TestArray();
+    
+	TestManager *tm = TestManager::GetInstance();
+
+	tm->AddTest("Type_Traits", TestType_Traits);
+	tm->AddTest("Vector",      TestVector);
+	tm->AddTest("Array",       TestArray);
+	
+	tm->Run();
 
     return 0;
 }

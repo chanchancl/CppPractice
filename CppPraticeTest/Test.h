@@ -10,10 +10,6 @@
 
 #pragma warning(disable:4101) // waring : 未引用的变量
 
-extern int total;
-extern int pass;
-extern int error;
-
 void _EXCEPT(bool bexpression, std::string expression, std::string file, long line);
 
 #define EXCEPT(expression) _EXCEPT((expression), #expression , __FILE__, __LINE__);
@@ -24,11 +20,6 @@ void _EXCEPT(bool bexpression, std::string expression, std::string file, long li
 // and at the end.
 //   call Report();
 //
-void Reset(const char*);
-
-void Report();
-
-
 
 
 // Test Functions
@@ -36,6 +27,8 @@ void TestType_Traits();
 void TestVector();
 void TestArray();
 
+
+#include <vector.h>
 
 typedef std::function<void()> TestFunction;
 
@@ -47,13 +40,37 @@ public:
     int mTotal; // 测试的总数
 
 public:
+	std::string  mName;
     TestFunction mFunction;
     
     // 输出
-    // 
+	UnitTest();
 
 };
 
+class TestManager
+{
+private:
+	TestManager();
+public:
+	// single mode
+	static TestManager* GetInstance();
+	UnitTest* GetCurrentTest();
+
+	// when you want to add a test
+	// the only thing you should do is
+	// AddTest( "Array", Test_Array);
+	// "Array" is the name of the test
+	// Test_Array is the test function;
+	void AddTest(std::string testName, TestFunction fun);
+	int Size();
+	void Run();
+
+private:
+	UnitTest *mCurrentTest;
+	sp::vector<UnitTest> mTests;
+	bool mReport;
+};
 
 
 #endif

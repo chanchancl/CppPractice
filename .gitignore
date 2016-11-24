@@ -219,3 +219,4 @@ CppPractice.VC.VC.opendb
 .vs/CppPractice/v15/Solution.VC.db-wal
 .vs/CppPractice/v15/Solution.VC.db-shm
 *.db
+*.opendb
