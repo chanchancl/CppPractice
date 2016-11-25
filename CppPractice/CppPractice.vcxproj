@@ -158,8 +158,10 @@
     <ClInclude Include="include\internal\type_properties.h" />
     <ClInclude Include="include\internal\type_transformation.h" />
     <ClInclude Include="include\iterator.h" />
+    <ClInclude Include="include\list.h" />
     <ClInclude Include="include\type_traits.h" />
     <ClInclude Include="include\uninitialized.h" />
+    <ClInclude Include="include\utility.h" />
     <ClInclude Include="include\vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

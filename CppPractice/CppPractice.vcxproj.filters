@@ -54,6 +54,12 @@
     <ClInclude Include="include\iterator.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\utility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\list.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

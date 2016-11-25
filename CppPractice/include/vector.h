@@ -35,7 +35,7 @@ namespace sp
         }
         vector_base(size_type size, const value_type& dt)
         {
-            _end = _begin = new value_type[size];
+            _end = _begin = alloc(size);
             for (size_type i = 0; i < size; i++)
             {
                 *_end = dt;
@@ -49,7 +49,10 @@ namespace sp
         {
             dealloc();
         }
-
+		pointer alloc(size_type size)
+		{
+			return (pointer)malloc(size * sizeof(value_type));
+		}
         void dealloc()
         {
             if (_begin)
@@ -66,8 +69,6 @@ namespace sp
         iterator _end;
         iterator _end_capacity;
 
-    public:
-        int count;
     };
     
     template<class T>
@@ -92,7 +93,7 @@ namespace sp
         // vector<T>默认的浅拷贝，会调用vector_base<T>的拷贝构造函数
         vector(const this_type& oth)
         {
-            _begin = new value_type[oth.capacity()];
+            _begin = alloc(oth.capacity());
             _end = _begin + oth.size();
             _end_capacity = _begin + oth.capacity();
             sp::copy(oth._begin, oth._end, _begin);
@@ -109,8 +110,8 @@ namespace sp
                 }
                 else
                 {
-                    base_type::dealloc();
-                    _begin = new value_type[oth.capacity()];
+                    dealloc();
+                    _begin = alloc(oth.capacity());
                     _end = _begin + oth.size();
                     _end_capacity = _begin + oth.capacity();
                     sp::copy(oth._begin, oth._end, _begin);
@@ -321,7 +322,7 @@ namespace sp
 
                 // 通过 TestObject 测试发现，这里不能用 new，因为会分配新对象，并调用构造函数
                 //iterator new_begin = new value_type[len];
-                iterator new_begin = (iterator)malloc(sizeof(value_type) * len);
+                iterator new_begin = alloc(len);
                 iterator new_end = new_begin;
 
                 new_end = uninitialized_copy(_begin, position, new_end);
@@ -361,7 +362,7 @@ namespace sp
                 if (len - old_size < n)
                     len = old_size + n;
 
-                iterator new_begin = new value_type[len];
+                iterator new_begin = alloc(len);
                 iterator new_end = new_begin;
 
                 new_end = uninitialized_copy(_begin, position, new_end);
