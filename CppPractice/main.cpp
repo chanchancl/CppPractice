@@ -1,6 +1,6 @@
 
 
-
+#include <algorithm>
 #include <vector.h>
 #include <array.h>
 #include <list.h>
@@ -15,10 +15,14 @@ void main()
 	sp::array<int,5> arr;
 	sp::list<int> li;
 
-	auto it = li.begin();
-	for (int i = 0; i < 100000; ++i)
-    {
-        vec.insert(vec.begin(),i);
-    }
+	for (int i = 1; i <= 100000; ++i)
+		vec.insert(vec.begin(),i);
 
+	cout << sp::count_if(vec.begin(), vec.end(), [](int x) {
+		return x % 10 == 0;
+	}) << endl;
+
+	cout << std::count_if(vec.begin(), vec.end(), [](int x) {
+		return x % 3 == 0;
+	}) << endl;
 }

@@ -56,8 +56,8 @@ namespace sp
         return max;
     }
 
-    template <typename InputIterator1, typename InputIterator2>
-    inline bool equal(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2)
+    template <typename InputIter1, typename InputIter2>
+    inline bool equal(InputIter1 first1, InputIter1 last1, InputIter2 first2)
     {
         for (; first1 != last1; ++first1, ++first2)
         {
@@ -66,6 +66,36 @@ namespace sp
         }
         return true;
     }
+
+	template <typename InputIter, typename T>
+	inline typename iterator_traits<InputIter>::difference_type
+	count(InputIter first, InputIter last, const T& value)
+	{
+		typename iterator_traits<InputIter>::difference_type ret = 0;
+
+		for (; first != last; ++first)
+		{
+			if (*first == value)
+				++ret;
+		}
+		return ret;
+	}
+
+	template <typename InputIter, typename Predicate>
+	inline typename iterator_traits<InputIter>::difference_type
+	count_if(InputIter first, InputIter last, Predicate predicate)
+	{
+		typename iterator_traits<InputIter>::difference_type ret = 0;
+
+		for (; first != last; ++first)
+		{
+			if (predicate(*first))
+				++ret;
+		}
+		return ret;
+	}
+
+
 }
 
 

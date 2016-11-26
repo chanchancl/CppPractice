@@ -14,23 +14,22 @@ namespace sp
 		ListNodeBase *_next;
 		ListNodeBase *_prev;
 
-	public:
 		ListNodeBase() : _next(nullptr), _prev(nullptr) {}
 		ListNodeBase(ListNodeBase* next, ListNodeBase* prev = nullptr) : _next(next), _prev(prev) {}
+
+		void insert(ListNodeBase *next)
+		{
+			_next = next;
+			_prev = next->_prev;
+			next->_prev->_next = this;
+			next->_prev = this;
+		}
 	};
 
 	template <typename T>
 	class ListNode : public ListNodeBase
 	{
 	public:
-		typedef T         value_type;
-		typedef T*        pointer;
-
-	public:
-		ListNode() : ListNodeBase() {}
-		ListNode(pointer next, pointer prev = nullptr) : ListNodeBase(next,prev) {}
-
-	private:
 		T _value;
 	};
 
@@ -55,6 +54,47 @@ namespace sp
 
 		// operator 
 		// + -  ++ --
+		ListIterator& operator++()
+		{
+			this->_node = static_cast<node_type*>(this->_node->_next);
+			return *this;
+		}
+		ListIterator operator++(int)
+		{
+			ListIterator tmp(*this);
+			this->_node = static_cast<node_type*>(this->_node->_next);
+			return tmp;
+		}
+		ListIterator& operator--()
+		{
+			this->_node = static_cast<node_type*>(this->_node->_prev);
+			return *this;
+		}
+		ListIterator operator--(int)
+		{
+			ListIterator tmp(*this);
+			this->_node = static_cast<node_type*>(this->_node->_prev);
+			return tmp;
+		}
+
+		inline bool operator==(const ListIterator& oth)
+		{
+			return this->_node == oth._node;
+		}
+		inline bool operator!=(const ListIterator& oth)
+		{
+			return this->_node != oth._node;
+		}
+
+		reference operator*() const
+		{
+			return _node->_value;
+		}
+		pointer	  operator->() const
+		{
+			return &_node->_value;
+		}
+		
 
 	private:
 		node_type *_node;
@@ -65,6 +105,7 @@ namespace sp
 	{
 	public:
 		typedef T										value_type;
+		typedef value_type&								reference;
 		typedef ListNode<T>								node_type;
 		typedef node_type*								node_pointer;
 		typedef ListNodeBase							node_base_type;
@@ -73,41 +114,58 @@ namespace sp
 		typedef ptrdiff_t								difference_type;
 
 	public:
-		ListBase() : _begin(&_begin,&_begin) {}
+		ListBase() : _node(&_node,&_node) {}
 		ListBase(size_type size)
 		{
-			_begin->_next = alloc(size);
+			_node->_next = alloc(size);
 		}
 		~ListBase()
 		{
 			dealloc();
 		}
 
-		node_pointer* alloc(size_type size)
+		node_pointer alloc_node(const value_type& x)
+		{
+			node_pointer pNode = (node_pointer)malloc(sizeof(node_type));
+			new(&pNode->_value) value_type(x);
+			return pNode;
+		}
+
+		node_pointer alloc(size_type size, node_pointer new_node = nullptr)
 		{
 			node_pointer ret, cur;
 			ret = cur = new node_type;
+			if (size != 0)
+				size - 1;
 			while (size--)
 				cur = cur->_next = new node_type;
-			cur->_next = &_begin;
-			_begin->_prev = cur;
+			if (new_node)
+			{
+				cur->_next = new_node;
+				new_node->_prev = cur;
+			}
+			else
+			{
+				cur->_next = &_node;
+				_node->_prev = cur;
+			}
 			return ret;
 		}
 
 		void dealloc()
 		{
-			node_base_pointer cur = _begin._next;
+			node_base_pointer cur = _node._next;
 
-			while( cur != &_begin  /*&& cur != nullptr*/ )
+			while( cur != &_node  /*&& cur != nullptr*/ )
 			{
 				cur = cur->_next;  // 先跳到下个元素，然后删除上个元素。
 				delete cur->_prev;
 			}
-			_begin._prev = _begin._next = &_begin;
+			_node._prev = _node._next = &_node;
 		}
 
 	protected:
-		node_base_type _begin;
+		node_base_type _node;
 	};
 
 	template <typename T>
@@ -130,44 +188,73 @@ namespace sp
 		typedef typename base_type::node_type           node_type;
 		typedef typename base_type::node_base_type      node_base_type;
 
-		using base_type::_begin;
+		using base_type::_node;
 
 	public:
-		list() {}
+		list() : ListBase() {}
 
 		iterator	   begin()
 		{
-			return iterator((node_type*)_begin._next);
+			return iterator((node_type*)_node._next);
 		}
 		const_iterator begin() const
 		{
-			return const_iterator((node_type*)_begin.next);
+			return const_iterator((node_type*)_node.next);
 		}
 		const_iterator cbegin() const
 		{
-			return const_iterator((node_type*)_begin.next);
+			return const_iterator((node_type*)_node.next);
 		}
 
 		iterator	   end()
 		{
-			return iterator((node_type*)_begin._prev);
+			return iterator((node_type*)&_node);
 		}
 		const_iterator end() const
 		{
-			return iterator((node_type*)_begin._prev);
+			return iterator((node_type*)&_node);
 		}
 		const_iterator cend() const
 		{
-			return const_iterator((node_type*)_begin._prev);
+			return const_iterator((node_type*)&_node);
 		}
 		
 		bool	  empty()
 		{
-			return _begin._next == &_begin;
+			return _node._next == &_node;
 		}
 		size_type size()
 		{
-			return 0;
+			return sp::distance(begin(), end());
+		}
+
+		void push_front(const reference x)
+		{
+			node_type* pNode = alloc_node(x);
+
+			pNode->insert(_node._next);
+		}
+
+		void push_back(const reference x)
+		{
+			node_type* pNode = alloc_node(x);
+
+			pNode->insert(&_node);
+		}
+
+		iterator erase(const_iterator position)
+		{
+			++position;
+
+			delete position._node->_prev;
+			return iterator(position._node);
+		}
+
+		iterator erase(const_iterator first, const_iterator last)
+		{
+			while (first != last)
+				erase(first);
+			return iterator(last._node);
 		}
 	};
 
