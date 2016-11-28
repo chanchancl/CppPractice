@@ -102,7 +102,7 @@ namespace sp
 		}
 		
 
-	private:
+	public:
 		node_type *_node;
 	};
 
@@ -121,30 +121,29 @@ namespace sp
 
 	public:
 		ListBase() : _node(&_node,&_node) {}
-		ListBase(size_type size)
-		{
-			_node->_next = alloc(size);
-		}
 		~ListBase()
 		{
 			dealloc();
 		}
 
-		node_pointer alloc_node(const value_type& x)
+		node_pointer alloc_node()
 		{
-			node_pointer pNode = (node_pointer)malloc(sizeof(node_type));
-			new(&pNode->_value) value_type(x);
+			return (node_pointer)malloc(sizeof(node_type));
+		}
+		node_pointer create_node(const value_type& value)
+		{
+			node_pointer pNode = alloc_node();
+			sp::construct(&pNode->_value, value);
 			return pNode;
 		}
 
 		node_pointer alloc(size_type size, node_pointer new_node = nullptr)
 		{
 			node_pointer ret, cur;
-			ret = cur = new node_type;
-			if (size != 0)
-				size - 1;
+			ret = cur = alloc_node();
+			
 			while (size--)
-				cur = cur->_next = new node_type;
+				cur = cur->_next = alloc_node();
 			if (new_node)
 			{
 				cur->_next = new_node;
@@ -165,7 +164,7 @@ namespace sp
 			while( cur != &_node  /*&& cur != nullptr*/ )
 			{
 				cur = cur->_next;  // 先跳到下个元素，然后删除上个元素。
-				delete cur->_prev;
+				dealloc_node(static_cast<node_pointer>(cur->_prev));
 			}
 			_node._prev = _node._next = &_node;
 		}
@@ -173,7 +172,10 @@ namespace sp
 		void dealloc_node(const node_pointer node)
 		{
 			if (node)
+			{
+				sp::destroy(&node->_value);
 				free(node);
+			}
 		}
 
 	protected:
@@ -198,44 +200,95 @@ namespace sp
 		typedef typename base_type::size_type           size_type;
 		typedef typename base_type::difference_type     difference_type;
 		typedef typename base_type::node_type           node_type;
+		typedef node_type*								node_pointer;
 		typedef typename base_type::node_base_type      node_base_type;
+		typedef node_base_type*							node_base_pointer;
 
 		using base_type::_node;
+		using base_type::create_node;
+		using base_type::alloc_node;
+		using base_type::dealloc_node;
+		using base_type::alloc;
+		using base_type::dealloc;
 
 	public:
-		list() : ListBase() {}
+		list() : base_type() {}
+		list(size_type size, const value_type& value)
+		{
+			insert(cbegin(), size, value);
+		}
+		list(const this_type& oth)
+		{
+			insert(cbegin(), oth.begin(), oth.end());
+		}
+
+		this_type& operator=(const this_type& oth)
+		{
+			if (this != &oth)
+			{
+				clear();
+				insert(begin(),oth.cbegin(), oth.cend());
+			}
+		}
 
 		iterator	   begin()
 		{
-			return iterator((node_type*)_node._next);
+			return iterator(node_pointer(_node._next));
 		}
 		const_iterator begin() const
 		{
-			return const_iterator((node_type*)_node.next);
+			return const_iterator(node_pointer(_node._next));
 		}
 		const_iterator cbegin() const
 		{
-			return const_iterator((node_type*)_node.next);
+			return const_iterator(node_pointer(_node._next));
 		}
 
 		iterator	   end()
 		{
-			return iterator((node_type*)&_node);
+			return iterator(node_pointer(&_node));
 		}
 		const_iterator end() const
 		{
-			return iterator((node_type*)&_node);
+			return const_iterator(node_pointer(&_node));
 		}
 		const_iterator cend() const
 		{
-			return const_iterator((node_type*)&_node);
+			return const_iterator(node_pointer(&_node));
 		}
+
+		reverse_iterator	   rbegin()
+		{
+			return reverse_iterator(node_pointer(_node._prev));
+		}
+		const_reverse_iterator rbegin() const
+		{
+			return const_reverse_iterator(node_pointer(_node._prev));
+		}
+		const_reverse_iterator crbegin() const
+		{
+			return const_reverse_iterator(node_pointer(_node._prev));
+		}
+
+		reverse_iterator	   rend()
+		{
+			return reverse_iterator(node_pointer(&_node));
+		}
+		const_reverse_iterator rend() const
+		{
+			return const_reverse_iterator(node_pointer(&_node));
+		}
+		const_reverse_iterator cren() const
+		{
+			return const_reverse_iterator(node_pointer(&_node));
+		}
+
 		
-		bool	  empty()
+		bool	   empty()
 		{
 			return _node._next == &_node;
 		}
-		size_type size()
+		size_type  size()
 		{
 			return sp::distance(begin(), end());
 		}
@@ -258,41 +311,67 @@ namespace sp
 			return *_node._prev->_value;
 		}
 
-		void push_front(const reference x)
+		void push_front(const value_type& x)
 		{
-			node_type* pNode = alloc_node(x);
+			node_pointer pNode = create_node(x);
 
-			pNode->insert(_node._next);
+			node_base_pointer(pNode)->insert(_node._next);
 		}
-		void push_back(const reference x)
+		void push_back(const value_type& x)
 		{
-			node_type* pNode = alloc_node(x);
+			node_pointer pNode = create_node(x);
 
-			pNode->insert(&_node);
+			node_base_pointer(pNode)->insert(&_node);
 		}
 
 		void pop_front()
 		{
-			node_type* pNode = _node._next;
+			node_pointer pNode = _node._next;
 			pNode->remove();
-			node_type*(pNode)->~node_type();
+			node_pointer(pNode)->~node_type();
 			
 		}
 		void pop_back()
 		{
-			node_type* pNode = _node._prev;
+			node_pointer pNode = _node._prev;
 			pNode->remove();
-			node_type*(pNode)->~node_type();
+			node_pointer(pNode)->~node_type();
+		}
+
+		iterator insert(const_iterator position, const value_type& x)
+		{
+			node_pointer pNode = create_node(x);
+			node_base_pointer(pNode)->insert(position._node);
+
+			return pNode;
+		}
+		void	 insert(const_iterator position, size_type size, const value_type& x)
+		{
+			while (size--)
+			{
+				node_pointer pNode = create_node(x);
+				node_base_pointer(pNode)->insert(position._node);
+			}
+		}
+		void	 insert(const_iterator position, const_iterator first, const_iterator last)
+		{
+			// 将[first,last)中的元素依次插入到position后
+			for (; first != last; ++first, ++position)
+			{
+				node_pointer pNode = alloc_node();
+				sp::construct(&pNode->_value, *first);
+				node_base_pointer(pNode)->insert(position._node);
+			}
 		}
 
 		iterator erase(const_iterator position)
 		{
 			++position;
 
+			dealloc_node(position._node->_prev);
 			delete position._node->_prev;
 			return iterator(position._node);
 		}
-
 		iterator erase(const_iterator first, const_iterator last)
 		{
 			while (first != last)
@@ -305,6 +384,12 @@ namespace sp
 			dealloc();
 		}
 	};
+
+	template<typename T>
+	bool operator==(const list<T>& li1, const list<T>& li2)
+	{
+		sp::equal(li1.begin(), li1.end(), li2.begin());
+	}
 
 }
 

@@ -15,7 +15,6 @@ namespace sp
     template <class ForwardIter, class T>
     inline void construct(ForwardIter iter, const T& value)
     {
-
         new(static_cast<void*>(&*iter)) T(value);
     }
 
@@ -67,6 +66,12 @@ namespace sp
 
         return result + (last-first);
     }
+
+	/*template<class InputIter, class OutIter>
+	inline OutIter copy(InputIter first, InputIter last, OutIter result)
+	{
+		
+	}*/
 
     // copy_backward
     // 如果数据区重叠，可以用 copy_backward

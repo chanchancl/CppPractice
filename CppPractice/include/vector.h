@@ -87,8 +87,8 @@ namespace sp
         
 
     public:
-        vector(): vector_base() {}
-        vector(size_type size , value_type dt) : base_type(size,dt) {}
+        vector(): base_type() {}
+        vector(size_type size , const value_type& value) : base_type(size, value) {}
         // 这里没有拷贝构造函数，这个行为由vector_base<T>来完成
         // vector<T>默认的浅拷贝，会调用vector_base<T>的拷贝构造函数
         vector(const this_type& oth)
@@ -240,7 +240,7 @@ namespace sp
             destroy(_end);
         }
 
-        iterator insert(iterator position, const value_type& value)
+        iterator insert(const_iterator position, const value_type& value)
         {
             size_type n = position - begin();
             if (_end != _end_capacity && position == _end)
@@ -249,7 +249,7 @@ namespace sp
                 insert_aux(position, value);
             return begin() + n;
         }
-        iterator insert(iterator position)
+        iterator insert(const_iterator position)
         {
             size_type n = position - begin();
             if (_end != _end_capacity && position == _end)
@@ -258,7 +258,7 @@ namespace sp
                 insert_aux(position, value_type());
             return begin() + n;
         }
-        iterator insert(iterator position, size_type n, const value_type& value)
+        void     insert(const_iterator position, size_type n, const value_type& value)
         {
             if (n > 0)
             {
@@ -279,8 +279,13 @@ namespace sp
                 return _begin + old_n;
             }
         }
+		void     insert(const_iterator position, const_iterator first, const_iterator last)
+		{
+			for (; first != last; ++first)
+				position = insert(position, *first);
+		}
 
-        iterator erase(iterator position)
+        iterator erase(const_iterator position)
         {
             if (last + 1 != end())
                 copy(position + 1, end(), position);
@@ -288,7 +293,7 @@ namespace sp
             destroy(_end);
             return position;
         }
-        iterator erase(iterator first, iterator last)
+        iterator erase(const_iterator first, const_iterator last)
         {
             iterator i = copy(last, _end, first);
             destroy(i, _end);
@@ -303,16 +308,17 @@ namespace sp
         }
 
     protected:
-        void insert_aux(iterator position, const value_type& x)
+        void insert_aux(const_iterator position, const value_type& x)
         {
+			iterator destPosition = const_cast<iterator>(position);
             if (_end != _end_capacity)
             {
                 // _end 为 uninitialized，使用 _end-1 来初始化它
                 construct(_end, *(_end - 1));
 
-                copy_backward(position, _end - 1, _end );
-                destroy(position);
-                construct(position, x);
+                copy_backward(destPosition, _end - 1, _end );
+                destroy(destPosition);
+                construct(destPosition, x);
                 ++_end;
             }
             else
@@ -325,14 +331,14 @@ namespace sp
                 iterator new_begin = alloc(len);
                 iterator new_end = new_begin;
 
-                new_end = uninitialized_copy(_begin, position, new_end);
+                new_end = uninitialized_copy(_begin, destPosition, new_end);
 
                 construct(new_end, x);
                 ++new_end;
                 //*new_end = x;
                 //++new_end;
 
-                new_end = uninitialized_copy(position, _end, new_end);
+                new_end = uninitialized_copy(destPosition, _end, new_end);
 
                 // 析构
                 // 释放内存
@@ -344,15 +350,15 @@ namespace sp
             }
 
         }
-        void insert_fill(iterator position, size_type n, const value_type& value)
+        void insert_fill(const_iterator position, size_type n, const value_type& value)
         {
-           
+			iterator destPosition = const_cast<iterator>(position);
             if (_end_capacity - _end >= n)
             {
                 // 剩余空间可以放下，不必重新分配空间
-                copy_backward(position, _end, position + n);
+                copy_backward(destPosition, _end, destPosition + n);
 
-                fill(position, position + n, value);
+                fill(destPosition, destPosition + n, value);
             }
             else
             {
@@ -365,9 +371,9 @@ namespace sp
                 iterator new_begin = alloc(len);
                 iterator new_end = new_begin;
 
-                new_end = uninitialized_copy(_begin, position, new_end);
+                new_end = uninitialized_copy(_begin, destPosition, new_end);
                 new_end = fill(_new_end, new_end + n, value);
-                new_end = uninitialized_copy(position, _end, new_end);
+                new_end = uninitialized_copy(destPosition, _end, new_end);
 
                 // 析构
                 // 释放内存

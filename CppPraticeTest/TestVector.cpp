@@ -3,65 +3,6 @@
 #include <vector.h>
 #include "Test.h"
 
-#define TEST_OBJECT_OUTPUT 0
-
-class TestObject
-{
-public:
-    TestObject()
-    {
-        _count = ConstructCount++;
-        ++DefaultConstruct;
-        ++Alive;
-        #if TEST_OBJECT_OUTPUT
-            std::cout << "Test Object :            " << _count << " Construct" << std::endl;
-        #endif
-    }
-    TestObject(const TestObject& obj)
-    {
-        _count = obj._count;
-        ++ConstructCount;
-        ++CopyConstruct;
-        ++Alive;
-    }
-    TestObject& operator=(const TestObject& obj)
-    {
-        ++AssignCopyConstruct;
-
-        if (this != &obj)
-            _count = obj._count;
-
-        return *this;
-    }
-
-
-    ~TestObject()
-    {
-        --Alive;
-        ++DestroyCount;
-        #if TEST_OBJECT_OUTPUT
-            std::cout << "Test Object : " << _count << " Destroy" << std::endl;
-        #endif
-    }
-
-    int _count;
-    static int Alive;
-    static int DefaultConstruct;
-    static int CopyConstruct;
-    static int AssignCopyConstruct;
-    static int ConstructCount;
-    static int DestroyCount;
-};
-
-// ¶¨Òåstatic class member
-int TestObject::Alive = 0;
-int TestObject::DefaultConstruct = 0;
-int TestObject::CopyConstruct = 0;
-int TestObject::AssignCopyConstruct = 0;
-int TestObject::ConstructCount = 0;
-int TestObject::DestroyCount = 0;
-
-
 void TestVector()
 {
     using namespace sp;
@@ -70,7 +11,12 @@ void TestVector()
     vector<int> vec1;
     vector<int> vec2(100, 2);
     vector<int> vec3(vec2);
+	vector<TestObject> vec4;
     
+	EXCEPT(vec1.size() == 0  );
+	EXCEPT(vec2.size() == 100);
+	EXCEPT(vec3.size() == 100);
+	EXCEPT(vec4.size() == 0  );
 
     vector<int>::iterator it;
     vector<int>::const_iterator cit = vec2.begin();
@@ -111,7 +57,7 @@ void TestVector()
     EXCEPT(vec1 == vec2);
 
     for (auto it = vec3.begin(); it != vec3.end(); ++it)
-        *it = *it + 1;
+        *it += 1;
     for (i = 0; i < (int)vec3.size(); ++i)
         EXCEPT(vec3[i] == 3);
 
@@ -132,7 +78,7 @@ void TestVector()
     EXCEPT(vec1 == vec2);
 
     // 
-    sp::vector<TestObject> vec4;
+    //sp::vector<TestObject> vec4;
     for (i = 0; i < 100; ++i)
         vec4.push_back(TestObject());
 

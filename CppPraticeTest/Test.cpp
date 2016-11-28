@@ -1,7 +1,7 @@
 
 #include "Test.h"
 
-void _EXCEPT(bool bexpression, std::string expression, std::string file, long line)
+void _EXCEPT(bool bexpression, const std::string& expression, const std::string& file, long line)
 {
 	UnitTest *Current = TestManager::GetInstance()->GetCurrentTest();
 	Current->mTotal++;
@@ -16,11 +16,15 @@ void _EXCEPT(bool bexpression, std::string expression, std::string file, long li
 	}
 }
 
-
-
+//************************************************************
+// UnitTest
+//************************************************************
 UnitTest::UnitTest() : mPass(0), mError(0), mTotal(0) {}
 
 
+//************************************************************
+// TestManager
+//************************************************************
 TestManager::TestManager() : mCurrentTest(nullptr)
 {
 }
@@ -81,3 +85,18 @@ void TestManager::Run()
 	}
 	cout << "*******************************************************" << endl;
 }
+
+//************************************************************
+// TestObject
+//************************************************************
+
+// ¶¨Òåstatic class member
+int TestObject::Alive = 0;
+int TestObject::DefaultConstruct = 0;
+int TestObject::CopyConstruct = 0;
+int TestObject::MoveConstruct = 0;
+int TestObject::AssignCopyConstruct = 0;
+int TestObject::MoveAssignment = 0;
+int TestObject::ConstructCount = 0;
+int TestObject::DestroyCount = 0;
+
