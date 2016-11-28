@@ -16,13 +16,10 @@ void main()
 	sp::list<int> li;
 
 	for (int i = 1; i <= 100000; ++i)
-		vec.insert(vec.begin(),i);
+		li.push_back(i);
 
-	cout << sp::count_if(vec.begin(), vec.end(), [](int x) {
-		return x % 10 == 0;
-	}) << endl;
-
-	cout << std::count_if(vec.begin(), vec.end(), [](int x) {
+	cout << sp::count_if(li.begin(), li.end(), [](int x) {
 		return x % 3 == 0;
 	}) << endl;
+
 }

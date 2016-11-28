@@ -95,7 +95,25 @@ namespace sp
 		return ret;
 	}
 
+	template <typename InputIter, typename T>
+	InputIter
+	find(InputIter first, InputIter last, const T& value)
+	{
+		for (; first != last; ++first)
+			if (*first == value)
+				return first;
+		return first;
+	}
 
+	template <typename InputIter, typename Predicate>
+	InputIter
+	find_if(InputIter first, InputIter last, Predicate predicate)
+	{
+		for (; first != last; ++first)
+			if (predicate(*first))
+				return first;
+		return first;
+	}
 }
 
 

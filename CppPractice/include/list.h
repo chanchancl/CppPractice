@@ -24,6 +24,11 @@ namespace sp
 			next->_prev->_next = this;
 			next->_prev = this;
 		}
+		void remove()
+		{
+			_next->_prev = _prev;
+			_prev->_next = _next;
+		}
 	};
 
 	template <typename T>
@@ -38,6 +43,7 @@ namespace sp
 	template <typename T, typename Pointer, typename Reference>
 	class ListIterator
 	{
+	public:
 		typedef ListIterator<T,Pointer,Reference>	this_type;
 		typedef T									value_type;
 		typedef Pointer								pointer;
@@ -164,6 +170,12 @@ namespace sp
 			_node._prev = _node._next = &_node;
 		}
 
+		void dealloc_node(const node_pointer node)
+		{
+			if (node)
+				free(node);
+		}
+
 	protected:
 		node_base_type _node;
 	};
@@ -228,18 +240,49 @@ namespace sp
 			return sp::distance(begin(), end());
 		}
 
+		reference  front()
+		{
+			// make sure  list is not empty
+			return *_node._next->_value;
+		}
+		value_type front() const
+		{
+			return *_node._next->_value;
+		}
+		reference  back()
+		{
+			return *_node._prev->_value;
+		}
+		value_type back() const
+		{
+			return *_node._prev->_value;
+		}
+
 		void push_front(const reference x)
 		{
 			node_type* pNode = alloc_node(x);
 
 			pNode->insert(_node._next);
 		}
-
 		void push_back(const reference x)
 		{
 			node_type* pNode = alloc_node(x);
 
 			pNode->insert(&_node);
+		}
+
+		void pop_front()
+		{
+			node_type* pNode = _node._next;
+			pNode->remove();
+			node_type*(pNode)->~node_type();
+			
+		}
+		void pop_back()
+		{
+			node_type* pNode = _node._prev;
+			pNode->remove();
+			node_type*(pNode)->~node_type();
 		}
 
 		iterator erase(const_iterator position)
@@ -255,6 +298,11 @@ namespace sp
 			while (first != last)
 				erase(first);
 			return iterator(last._node);
+		}
+
+		void clear()
+		{
+			dealloc();
 		}
 	};
 
