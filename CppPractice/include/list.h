@@ -83,13 +83,21 @@ namespace sp
 			return tmp;
 		}
 
-		inline bool operator==(const ListIterator& oth)
+		template <typename Pointer2, typename Reference2>
+		inline bool operator==(const ListIterator<T,Pointer2,Reference2>& oth)
 		{
 			return this->_node == oth._node;
 		}
-		inline bool operator!=(const ListIterator& oth)
+		template <typename Pointer2, typename Reference2>
+		inline bool operator!=(const ListIterator<T, Pointer2, Reference2>& oth)
 		{
 			return this->_node != oth._node;
+		}
+
+		template <typename Pointer2, typename Reference2>
+		operator ListIterator<T, Pointer2, Reference2>()
+		{
+			return ListIterator<T, Pointer2, Reference2>(this->_node);
 		}
 
 		reference operator*() const
@@ -296,19 +304,19 @@ namespace sp
 		reference  front()
 		{
 			// make sure  list is not empty
-			return *_node._next->_value;
+			return node_pointer(_node._next)->_value;
 		}
 		value_type front() const
 		{
-			return *_node._next->_value;
+			return node_pointer(_node._next)->_value;
 		}
 		reference  back()
 		{
-			return *_node._prev->_value;
+			return node_pointer(_node._prev)->_value;
 		}
 		value_type back() const
 		{
-			return *_node._prev->_value;
+			return node_pointer(_node._prev)->_value;
 		}
 
 		void push_front(const value_type& x)
@@ -368,14 +376,15 @@ namespace sp
 		{
 			++position;
 
-			dealloc_node(position._node->_prev);
-			delete position._node->_prev;
+			node_base_pointer pNode = position._node->_prev;
+			pNode->remove();
+			dealloc_node(node_pointer(pNode));
 			return iterator(position._node);
 		}
 		iterator erase(const_iterator first, const_iterator last)
 		{
 			while (first != last)
-				erase(first);
+				first = erase(first);
 			return iterator(last._node);
 		}
 
@@ -388,7 +397,7 @@ namespace sp
 	template<typename T>
 	bool operator==(const list<T>& li1, const list<T>& li2)
 	{
-		sp::equal(li1.begin(), li1.end(), li2.begin());
+		return sp::equal(li1.begin(), li1.end(), li2.begin());
 	}
 
 }

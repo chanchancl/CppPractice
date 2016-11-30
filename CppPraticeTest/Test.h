@@ -66,7 +66,7 @@ private:
 };
 
 
-#define TEST_OBJECT_OUTPUT 1
+#define TEST_OBJECT_OUTPUT 0
 
 class TestObject
 {
