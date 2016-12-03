@@ -2,6 +2,7 @@
 #include <vector>
 #include <vector.h>
 #include "Test.h"
+#include <sort.h>
 
 void TestVector()
 {
@@ -77,6 +78,17 @@ void TestVector()
     }
     EXCEPT(vec1 == vec2);
 
+	vec1.clear();
+	vec2.clear();
+	for (i = 0; i < 50; ++i)
+	{
+		vec1.push_back(i);
+		vec2.push_back(50-i-1);
+	}
+	bubble_sort(vec2.begin(), vec2.end());
+	EXCEPT(is_sorted(vec1.begin(), vec1.begin()));
+	EXCEPT(is_sorted(vec2.begin(), vec2.begin()));
+	EXCEPT(vec1 == vec2);
     // 
     //sp::vector<TestObject> vec4;
     for (i = 0; i < 100; ++i)

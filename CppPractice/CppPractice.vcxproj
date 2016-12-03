@@ -159,6 +159,7 @@
     <ClInclude Include="include\internal\type_transformation.h" />
     <ClInclude Include="include\iterator.h" />
     <ClInclude Include="include\list.h" />
+    <ClInclude Include="include\sort.h" />
     <ClInclude Include="include\type_traits.h" />
     <ClInclude Include="include\uninitialized.h" />
     <ClInclude Include="include\utility.h" />

@@ -35,7 +35,7 @@ namespace sp
 	return a > b ? (b > c ? b : (a > c ? c : a) ) : (b < c ? b : (a < c ? c : a));
 	}*/
     template <typename ForwardIter>
-    inline ForwardIter max(ForwardIter first, ForwardIter last)
+    inline ForwardIter max_element(ForwardIter first, ForwardIter last)
     {
         ForwardIter max = first;
 		++first;
@@ -46,14 +46,15 @@ namespace sp
         return max;
     }
     template <typename ForwardIter>
-    inline ForwardIter min(ForwardIter first, ForwardIter last)
+    inline ForwardIter min_element(ForwardIter first, ForwardIter last)
     {
         ForwardIter min = first;
+		++first;
         for (; first != last; ++first)
             if (*min > *first)
-                max = first;
+				min = first;
 
-        return max;
+        return min;
     }
 
     template <typename InputIter1, typename InputIter2>
@@ -114,6 +115,8 @@ namespace sp
 				return first;
 		return first;
 	}
+
+
 }
 
 

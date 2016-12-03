@@ -288,15 +288,15 @@ namespace sp
         iterator erase(const_iterator position)
         {
             if (last + 1 != end())
-                copy(position + 1, end(), position);
+                sp::copy(position + 1, end(), position);
             --_end;
-            destroy(_end);
+            sp::destroy(_end);
             return position;
         }
         iterator erase(const_iterator first, const_iterator last)
         {
-            iterator i = copy(last, _end, first);
-            destroy(i, _end);
+            iterator i = sp::copy(last, _end, first);
+            sp::destroy(i, _end);
             _end = _end - (last - first);
             return first;
         }
@@ -314,11 +314,11 @@ namespace sp
             if (_end != _end_capacity)
             {
                 // _end 为 uninitialized，使用 _end-1 来初始化它
-                construct(_end, *(_end - 1));
+                sp::construct(_end, *(_end - 1));
 
-                copy_backward(destPosition, _end - 1, _end );
-                destroy(destPosition);
-                construct(destPosition, x);
+                sp::copy_backward(destPosition, _end - 1, _end );
+                sp::destroy(destPosition);
+                sp::construct(destPosition, x);
                 ++_end;
             }
             else
@@ -331,14 +331,14 @@ namespace sp
                 iterator new_begin = alloc(len);
                 iterator new_end = new_begin;
 
-                new_end = uninitialized_copy(_begin, destPosition, new_end);
+                new_end = sp::uninitialized_copy(_begin, destPosition, new_end);
 
-                construct(new_end, x);
+                sp::construct(new_end, x);
                 ++new_end;
                 //*new_end = x;
                 //++new_end;
 
-                new_end = uninitialized_copy(destPosition, _end, new_end);
+                new_end = sp::uninitialized_copy(destPosition, _end, new_end);
 
                 // 析构
                 // 释放内存
@@ -356,7 +356,7 @@ namespace sp
             if (_end_capacity - _end >= n)
             {
                 // 剩余空间可以放下，不必重新分配空间
-                copy_backward(destPosition, _end, destPosition + n);
+                sp::copy_backward(destPosition, _end, destPosition + n);
 
                 fill(destPosition, destPosition + n, value);
             }
@@ -393,8 +393,8 @@ namespace sp
     {
         if (v1.size() != v2.size())
             return false;
-        sp::equal(v1.begin(), v1.end(), v2.begin());
-        return true;
+        
+        return sp::equal(v1.begin(), v1.end(), v2.begin());
     }
 
 

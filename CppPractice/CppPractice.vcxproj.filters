@@ -60,6 +60,9 @@
     <ClInclude Include="include\list.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\sort.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

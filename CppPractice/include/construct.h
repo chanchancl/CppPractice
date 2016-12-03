@@ -58,7 +58,7 @@ namespace sp
     // copy
     // 确定数据区不会重叠，就使用copy
     template <class InputIter, class OutIter>
-    inline OutIter copy(InputIter first, InputIter last, OutIter result)
+    inline OutIter copy_impl(InputIter first, InputIter last, OutIter result, true_type)
     {
         typedef typename iterator_traits<InputIter>::value_type value_type;
 
@@ -67,21 +67,52 @@ namespace sp
         return result + (last-first);
     }
 
-	/*template<class InputIter, class OutIter>
+	template <class InputIter, class OutIter>
+	inline OutIter copy_impl(InputIter first, InputIter last, OutIter result, false_type)
+	{
+		typedef typename iterator_traits<InputIter>::value_type value_type;
+
+		for (; first != last; ++first, ++result)
+			*result = *first;  // construct(result,*first);
+
+		return result + (last - first);
+	}
+
+	template <class InputIter, class OutIter>
 	inline OutIter copy(InputIter first, InputIter last, OutIter result)
 	{
-		
-	}*/
+		typedef typename iterator_traits<InputIter>::value_type value_type;
+
+		return copy_impl(first, last, result, is_pod<value_type>());
+	}
 
     // copy_backward
     // 如果数据区重叠，可以用 copy_backward
     template <class InputIter, class OutIter>
-    inline OutIter copy_backward(InputIter first, InputIter last, OutIter resultEnd)
+    inline OutIter copy_backward_impl(InputIter first, InputIter last, OutIter resultEnd, true_type)
     {
         typedef typename iterator_traits<InputIter>::value_type value_type;
 
         return (OutIter)::memmove(&*(resultEnd - (last - first)), &*first, sizeof(value_type)*(last - first));
     }
+
+	template <class InputIter, class OutIter>
+	inline OutIter copy_backward_impl(InputIter first, InputIter last, OutIter resultEnd, false_type)
+	{
+		for (; last != first; --last, --resultEnd)
+			*resultEnd = *last;
+
+		return first;
+	}
+
+	template <class InputIter, class OutIter>
+	inline OutIter copy_backward(InputIter first, InputIter last, OutIter resultEnd)
+	{
+		typedef typename iterator_traits<InputIter>::value_type value_type;
+
+		return copy_backward_impl(first, last, resultEnd, is_pod<value_type>());
+	}
+
 
     template <bool bIsScalar>
     struct fill_imp
@@ -200,7 +231,6 @@ namespace sp
     {
         return (bool*)memset(first, (char)b, n) + (size_t)n;
     }
-
 
 }
 
