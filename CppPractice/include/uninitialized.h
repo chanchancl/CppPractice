@@ -14,12 +14,14 @@ namespace sp
 
     namespace Internal
     {
+		// trivial 类型，直接copy
         template <class InputIter, class ForwardIter>
         inline ForwardIter uninitlized_copy_impl(InputIter first, InputIter last, ForwardIter result, true_type)
         {
            return sp::copy(first, last, result);
         }
 
+		// 非 trivail，需要执行 construct copy
         template <class InputIter, class ForwardIter>
         inline ForwardIter uninitlized_copy_impl(InputIter first, InputIter last, ForwardIter result, false_type)
         {
@@ -32,6 +34,7 @@ namespace sp
         }
     }
 
+	// 复制 [first,last) 范围内的元素到以result开头的连续空间中
     template <class InputIter,class ForwardIter>
     inline ForwardIter uninitialized_copy(InputIter first, InputIter last, ForwardIter result)
     {

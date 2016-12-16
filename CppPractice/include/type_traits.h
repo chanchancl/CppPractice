@@ -37,8 +37,8 @@ namespace sp
     typedef integral_constant<bool, false> false_type;
 
     // bool_constant
-    template <bool B>
-    using bool_constant = integral_constant<bool, B>;
+    template <bool BOOL>
+    using bool_constant = integral_constant<bool, BOOL>;
     
     // type_select
     // typedef ChosenType = type_select<is_pointer<some_type>::type, iterator, const_iterator>::type;
@@ -148,6 +148,39 @@ namespace sp
     template <typename T> struct remove_reference { typedef T type; };
     template <typename T> struct remove_reference<T&> { typedef T type; };
     template <typename T> struct remove_reference<T&&> { typedef T type; };
+
+	// add_lvalue_reference
+
+	template <typename T> struct add_lvalue_reference						{ typedef T& type; };
+	template <typename T> struct add_lvalue_reference<T&>					{ typedef T& type; };
+	template <>			  struct add_lvalue_reference<void>					{ typedef void type; };
+	template <>			  struct add_lvalue_reference<const void>			{ typedef const void type; };
+	template <>			  struct add_lvalue_reference<volatile void>		{ typedef volatile void type; };
+	template <>			  struct add_lvalue_reference<const volatile void>	{ typedef const volatile void type; };
+
+	// add_rvalue_reference
+	///////////////////////////////////////////////////////////////////////
+	// add_rvalue_reference
+	//
+	// C++11 Standard, section 20.9.7.2
+	// If T names an object or function type then the member typedef type
+	// shall name T&&; otherwise, type shall name T. [ Note: This rule reflects
+	// the semantics of reference collapsing (8.3.2). For example, when a type T
+	// names a type T1&, the type add_rvalue_reference<T>::type is not an
+	// rvalue reference. end note ]
+	//
+	// Rules (8.3.2 p6):
+	//      void + &&  -> void
+	//      T    + &&  -> T&&
+	//      T&   + &&  -> T&
+	//      T&&  + &&  -> T&&
+	///////////////////////////////////////////////////////////////////////
+	template <typename T> struct add_rvalue_reference						{ typedef T&& type; }; 
+	template <typename T> struct add_rvalue_reference<T&>					{ typedef T& type; };
+	template <>           struct add_rvalue_reference<void>					{ typedef void type; };
+	template <>           struct add_rvalue_reference<const void>			{ typedef const void type; };
+	template <>           struct add_rvalue_reference<volatile void>		{ typedef volatile void type; };
+	template <>           struct add_rvalue_reference<const volatile void>	{ typedef const volatile void type; };
 
     // static_min   static_max
     template <size_t I0, size_t I1>

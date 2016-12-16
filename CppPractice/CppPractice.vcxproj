@@ -146,12 +146,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\internal\normal_tree.h" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\algorithm.h" />
     <ClInclude Include="include\array.h" />
     <ClInclude Include="include\construct.h" />
+    <ClInclude Include="include\functional.h" />
     <ClInclude Include="include\internal\type_compound.h" />
     <ClInclude Include="include\internal\type_fundamental.h" />
     <ClInclude Include="include\internal\type_pod.h" />
@@ -159,6 +161,7 @@
     <ClInclude Include="include\internal\type_transformation.h" />
     <ClInclude Include="include\iterator.h" />
     <ClInclude Include="include\list.h" />
+    <ClInclude Include="include\pair.h" />
     <ClInclude Include="include\sort.h" />
     <ClInclude Include="include\type_traits.h" />
     <ClInclude Include="include\uninitialized.h" />

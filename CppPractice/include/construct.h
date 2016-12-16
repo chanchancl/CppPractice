@@ -57,6 +57,7 @@ namespace sp
 
     // copy
     // 确定数据区不会重叠，就使用copy
+	// 
     template <class InputIter, class OutIter>
     inline OutIter copy_impl(InputIter first, InputIter last, OutIter result, true_type)
     {
@@ -73,7 +74,7 @@ namespace sp
 		typedef typename iterator_traits<InputIter>::value_type value_type;
 
 		for (; first != last; ++first, ++result)
-			*result = *first;  // construct(result,*first);
+			*result = *first;
 
 		return result + (last - first);
 	}

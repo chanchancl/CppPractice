@@ -4,22 +4,10 @@
 #define __SORT_H__
 
 #include <algorithm.h>
+#include <functional.h>
 
 namespace sp
 {
-
-	// temp functional
-
-	template <typename T>
-	struct less
-	{
-		bool operator()(const T& a, const T& b)
-		{
-			return a < b;
-		}
-	};
-
-
 	template <typename ForwardIter, typename Compare>
 	bool is_sorted(ForwardIter first, ForwardIter last, Compare compare)
 	{
@@ -51,12 +39,12 @@ namespace sp
 	{
 		for (; first != last; ++first)
 		{
-			ForwardIter find = first, tmp = first;
-			++tmp;
-			for (; tmp != last; ++tmp)
+			ForwardIter find = first, current = first;
+			++current;
+			for (; current != last; ++current)
 			{
-				if (compare(*tmp, *find))
-					find = tmp;
+				if (compare(*current, *find))
+					find = current;
 			}
 
 			sp::swap(*find, *first);
@@ -75,17 +63,20 @@ namespace sp
 	template <typename ForwardIter, typename Compare>
 	void bubble_sort(ForwardIter first, ForwardIter last, Compare compare )
 	{
-		ForwardIter cur,tmpfirst;
+		ForwardIter current,next;
 		bool sorted = false;
-		for (; sorted = !sorted; ++cur)
+		for (; sorted = !sorted; /*++current*/)
 		{
-			tmpfirst = cur = first;
+			current = next = first;
 			
-			for (++cur; cur != last; ++cur,++tmpfirst)
+			for (++next; next != last; ++current,++next)
 			{
-				if (compare(*cur, *tmpfirst))
+				// 当前元素，与前一个元素比较，若符合，则交换.
+				// less ->  return *cur < *tmpfirst;
+				// 则为升序排列
+				if (compare(*next, *current))
 				{
-					swap(*cur, *tmpfirst);
+					swap(*next, *current);
 					sorted = false;
 				}
 			}

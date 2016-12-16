@@ -85,7 +85,8 @@ void TestVector()
 		vec1.push_back(i);
 		vec2.push_back(50-i-1);
 	}
-	bubble_sort(vec2.begin(), vec2.end());
+	//bubble_sort(vec2.begin(), vec2.end());
+	selection_sort(vec2.begin(), vec2.end());
 	EXCEPT(is_sorted(vec1.begin(), vec1.begin()));
 	EXCEPT(is_sorted(vec2.begin(), vec2.begin()));
 	EXCEPT(vec1 == vec2);
