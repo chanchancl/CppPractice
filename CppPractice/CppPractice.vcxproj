@@ -86,9 +86,10 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
+      <Optimization>Full</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)CppPractice\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,7 +147,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="include\internal\normal_tree.h" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +161,7 @@
     <ClInclude Include="include\internal\type_transformation.h" />
     <ClInclude Include="include\iterator.h" />
     <ClInclude Include="include\list.h" />
+    <ClInclude Include="include\normal_tree.h" />
     <ClInclude Include="include\pair.h" />
     <ClInclude Include="include\sort.h" />
     <ClInclude Include="include\type_traits.h" />

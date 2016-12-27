@@ -8,9 +8,8 @@
 namespace sp
 {
 
-	class ListNodeBase
+	struct ListNodeBase
 	{
-	public:
 		ListNodeBase *_next;
 		ListNodeBase *_prev;
 
@@ -336,14 +335,13 @@ namespace sp
 		{
 			node_pointer pNode = _node._next;
 			pNode->remove();
-			node_pointer(pNode)->~node_type();
-			
+			dealloc_node(pNode);
 		}
 		void pop_back()
 		{
 			node_pointer pNode = _node._prev;
 			pNode->remove();
-			node_pointer(pNode)->~node_type();
+			dealloc_node(pNode);
 		}
 
 		iterator insert(const_iterator position, const value_type& x)
@@ -366,8 +364,7 @@ namespace sp
 			// 将[first,last)中的元素依次插入到position后
 			for (; first != last; ++first, ++position)
 			{
-				node_pointer pNode = alloc_node();
-				sp::construct(&pNode->_value, *first);
+				node_pointer pNode = create_node(*first);
 				node_base_pointer(pNode)->insert(position._node);
 			}
 		}

@@ -15,8 +15,8 @@ void TestList()
 	EXCEPT(li3.size() == 100);
 	EXCEPT(li4.size() == 0  );
 
-	for (auto it = li2.begin(); it != li2.end(); ++it)
-		EXCEPT(*it == 2);
+	/*for (auto it = li2.begin(); it != li2.end(); ++it)
+		EXCEPT(*it == 2);*/
 
 	li2.front() = 5;
 	li2.back() = 5;

@@ -69,13 +69,13 @@
     <ClInclude Include="include\pair.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\normal_tree.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="include\internal\normal_tree.h">
-      <Filter>头文件\internal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

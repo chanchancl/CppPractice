@@ -72,7 +72,7 @@ namespace sp
 			for (++next; next != last; ++current,++next)
 			{
 				// 当前元素，与前一个元素比较，若符合，则交换.
-				// less ->  return *cur < *tmpfirst;
+				// less ->  return *next < *current;
 				// 则为升序排列
 				if (compare(*next, *current))
 				{

@@ -88,18 +88,24 @@ void TestType_Traits()
 
         // is_null_ptr
         EXCEPT(is_null_pointer<std::nullptr_t>::value == true);
+		EXCEPT(is_null_pointer<decltype(nullptr)>::value == true);
         EXCEPT(is_null_pointer<void*>::value == false);
         EXCEPT(is_null_pointer<int*>::value == false);
 
         // is_integral
         EXCEPT(is_integral<int>::value == true);
         EXCEPT(is_integral<const int>::value == true);
-        EXCEPT(is_integral<float>::value == false);
+		EXCEPT(is_integral<volatile unsigned int>::value == true);
+		EXCEPT(is_integral<const long long>::value == true);
+		EXCEPT(is_integral<__int64>::value == true);
+		EXCEPT(is_integral<float>::value == false);
 
         // is_floating_point
         EXCEPT(is_floating_point<float>::value == true);
+		EXCEPT(is_floating_point<double>::value == true);
         EXCEPT(is_floating_point<long double>::value == true);
         EXCEPT(is_floating_point<const float>::value == true);
+		EXCEPT(is_floating_point<volatile const double>::value == true);
         EXCEPT(is_floating_point<int>::value == false);
 
         // is_arithmetic
@@ -132,27 +138,27 @@ void TestType_Traits()
         EXCEPT(is_reference<int*>::value == false);
 
         // is_member_function_pointer
-		class Class {};
+		class _Class {};
         EXCEPT(is_member_function_pointer<int>::value == false);
-        EXCEPT(is_member_function_pointer<int(Class::*)>::value == false);
-        EXCEPT(is_member_function_pointer<int(Class::*)()>::value == true);
-        EXCEPT(is_member_function_pointer<int(Class::*)(int)>::value == true);
+        EXCEPT(is_member_function_pointer<int(_Class::*)>::value == false);
+        EXCEPT(is_member_function_pointer<int(_Class::*)()>::value == true);
+        EXCEPT(is_member_function_pointer<int(_Class::*)(int)>::value == true);
 
         // is_member_object_pointer
         EXCEPT(is_member_object_pointer<int>::value == false);
-        EXCEPT(is_member_object_pointer<int(Class::*)>::value == true);
-        EXCEPT(is_member_object_pointer<int(Class::*)()>::value == false);
+        EXCEPT(is_member_object_pointer<int(_Class::*)>::value == true);
+        EXCEPT(is_member_object_pointer<int(_Class::*)()>::value == false);
 
         // is_member_pointer
         EXCEPT(is_member_pointer<int>::value == false);
-        EXCEPT(is_member_pointer<int(Class::*)>::value == true);
-        EXCEPT(is_member_pointer<int(Class::*)()>::value == true);
+        EXCEPT(is_member_pointer<int(_Class::*)>::value == true);
+        EXCEPT(is_member_pointer<int(_Class::*)()>::value == true);
 
         // is_pointer
         EXCEPT(is_pointer<int*>::value == true);
         EXCEPT(is_pointer<const int*>::value == true);
         EXCEPT(is_pointer<int>::value == false);
-        EXCEPT(is_pointer<Class*>::value == true);
+        EXCEPT(is_pointer<_Class*>::value == true);
         EXCEPT(is_pointer<int**>::value == true);
 
         // is_enum
@@ -161,7 +167,7 @@ void TestType_Traits()
         EXCEPT(is_enum<const Enum>::value == true);
         EXCEPT(is_enum<int>::value == false);
         EXCEPT(is_enum<Enum*>::value == false);
-        EXCEPT(is_enum<Class>::value == false);
+        EXCEPT(is_enum<_Class>::value == false);
         
         // is_union
         union Union {};
@@ -169,18 +175,18 @@ void TestType_Traits()
         EXCEPT(is_union<const Union>::value == true);
         EXCEPT(is_union<int>::value == false);
         EXCEPT(is_union<Union*>::value == false);
-        EXCEPT(is_union<Class>::value == false);
+        EXCEPT(is_union<_Class>::value == false);
 
         // is_class
-        EXCEPT(is_class<Class>::value == true);
-        EXCEPT(is_class<const Class>::value == true);
+        EXCEPT(is_class<_Class>::value == true);
+        EXCEPT(is_class<const _Class>::value == true);
         EXCEPT(is_class<int>::value == false);
-        EXCEPT(is_class<Class*>::value == false);
-        EXCEPT(is_class<volatile Class>::value == true);
+        EXCEPT(is_class<_Class*>::value == false);
+        EXCEPT(is_class<volatile _Class>::value == true);
 
         // is_function
         typedef void  Function1();
-        typedef int*  Function2(Class, int, long);
+        typedef int*  Function2(_Class, int, long);
         typedef void* Function3();
         EXCEPT(is_function<Function1>::value == true);
         EXCEPT(is_function<Function2>::value == true);
@@ -190,7 +196,7 @@ void TestType_Traits()
 
         // is_object
         EXCEPT(is_object<int>::value == true);
-        EXCEPT(is_object<Class>::value == true);
+        EXCEPT(is_object<_Class>::value == true);
         EXCEPT(is_object<int*>::value == true);
         EXCEPT(is_object<int&>::value == false);
 
@@ -202,7 +208,7 @@ void TestType_Traits()
         EXCEPT(is_scalar<int*>::value == true);
 
         // is_compound
-        EXCEPT(is_compound<Class>::value == true);
+        EXCEPT(is_compound<_Class>::value == true);
         EXCEPT(is_compound<Enum>::value == true);
         EXCEPT(is_compound<Union>::value == true);
         EXCEPT(is_compound<int*>::value == true);
@@ -220,29 +226,55 @@ void TestType_Traits()
 		{
 			NoPod() {};
 		};
+		class Destroy
+		{
+			~Destroy() {}
+		};
+
         EXCEPT(is_pod<Pod1>::value == true);
         EXCEPT(is_pod<Pod2>::value == true);
-        EXCEPT(is_pod<Class>::value == true);
+        EXCEPT(is_pod<_Class>::value == true);
         EXCEPT(is_pod<int>::value == true);
         EXCEPT(is_pod<int*>::value == true);
         EXCEPT(is_pod<NoPod>::value == false);
 
-        // has_trivial_xxxx
-        /*EXCEPT(has_trivial_default_constructor<int>::value == true);
-        EXCEPT(has_trivial_default_constructor<int*>::value == true);*/
+		// is_trivial
+		EXCEPT(is_trivial<Pod1>::value == true);
+		EXCEPT(is_trivial<Pod2>::value == true);
+		EXCEPT(is_trivial<_Class>::value == true);
+		EXCEPT(is_trivial<int>::value == true);
+
+		class _CS
+		{
+			_CS() {}
+		};
+		EXCEPT(is_trivially_constructible<_CS>::value == false);
+		EXCEPT(is_trivially_constructible<Destroy>::value == true);
+		EXCEPT(is_trivially_constructible<int>::value == true);
+		
+		class _COPY
+		{
+			_COPY(const _COPY& oth) {}
+		};
+		
+		EXCEPT(is_trivially_copyable<_COPY>::value == false);
+		EXCEPT(is_trivially_copyable<_CS>::value == true);
+		EXCEPT(is_trivially_copyable<int>::value == true);
+
+
 
         // is_signed
         EXCEPT(is_signed<int>::value == true);
         EXCEPT(is_signed<const long long>::value == true);
         EXCEPT(is_signed<unsigned int>::value == false);
-        EXCEPT(is_signed<Class>::value == false);
+        EXCEPT(is_signed<_Class>::value == false);
         EXCEPT(is_signed<bool>::value == false);
 
         // is_unsigned
         EXCEPT(is_unsigned<unsigned int>::value == true);
         EXCEPT(is_unsigned<unsigned char>::value == true);
         EXCEPT(is_unsigned<int>::value == false);
-        EXCEPT(is_unsigned<Class>::value == false);
+        EXCEPT(is_unsigned<_Class>::value == false);
         EXCEPT(is_unsigned<bool>::value == false);
 
         
