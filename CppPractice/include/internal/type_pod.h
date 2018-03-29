@@ -118,7 +118,7 @@ namespace sp
 	struct is_destructible : public bool_constant<__is_destructible(T)> {};
 
 	template <typename T, class ...Args>
-	struct is_trivially_constructible : public bool_constant<__is_trivially_constructible(T)> {};
+	struct is_trivially_constructible : public bool_constant<__is_trivially_constructible(T, Args...)> {};
 
 	template <typename T>
 	struct is_trivially_copy_constructible : public is_trivially_constructible<T, typename add_rvalue_reference< typename add_const<T>::type>::type>::type {};

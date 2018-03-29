@@ -16,8 +16,8 @@ void TestVector();
 void TestArray();
 void TestList();
 
-void   _EXCEPT(bool bexpression, const std::string& expression, const std::string& file, long line);
-#define EXCEPT(expression) _EXCEPT((expression), #expression , __FILE__, __LINE__);
+void   _EXCEPT(bool bexpression, const std::string expression, const std::string file, long line);
+#define EXCEPT(expression) _EXCEPT((expression), #expression , __FILE__, __LINE__)
 
 #include <vector.h>
 

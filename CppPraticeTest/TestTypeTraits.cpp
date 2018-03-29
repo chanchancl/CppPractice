@@ -249,9 +249,11 @@ void TestType_Traits()
 			_CS() {}
 		};
 		EXCEPT(is_trivially_constructible<_CS>::value == false);
-		EXCEPT(is_trivially_constructible<Destroy>::value == true);
+		EXCEPT(is_trivially_constructible<Destroy>::value == false);
 		EXCEPT(is_trivially_constructible<int>::value == true);
-		
+		EXCEPT(std::is_trivially_constructible<int>::value == true);
+
+
 		class _COPY
 		{
 			_COPY(const _COPY& oth) {}

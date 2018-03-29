@@ -1,7 +1,7 @@
 
 #include "Test.h"
 
-void _EXCEPT(bool bexpression, const std::string& expression, const std::string& file, long line)
+void _EXCEPT(bool bexpression, const std::string expression, const std::string file, long line)
 {
 	UnitTest *Current = TestManager::GetInstance()->GetCurrentTest();
 	Current->mTotal++;

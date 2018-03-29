@@ -39,6 +39,7 @@ namespace sp
 	{
 		for (; first != last; ++first)
 		{
+			// 寻找 [first,last) 区间最大/小的元素
 			ForwardIter find = first, current = first;
 			++current;
 			for (; current != last; ++current)
@@ -46,7 +47,7 @@ namespace sp
 				if (compare(*current, *find))
 					find = current;
 			}
-
+			// 与first交换
 			sp::swap(*find, *first);
 		}
 	}
@@ -64,7 +65,7 @@ namespace sp
 	void bubble_sort(ForwardIter first, ForwardIter last, Compare compare )
 	{
 		ForwardIter current,next;
-		bool sorted = false;
+		bool sorted = false; // sorted == false 表示序列'有可能'处于无序状态
 		for (; sorted = !sorted; /*++current*/)
 		{
 			current = next = first;

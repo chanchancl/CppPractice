@@ -25,7 +25,17 @@ namespace sp
 	{
 		NormalTreeNode(NormalTreeNode* p = nullptr) : BaseNormalTreeNode(p) {}
 		T _value;
+
+		bool HaveChild() { return _lchild != nullptr || _rchild != nullptr; }
 	};
+
+	template <typename T>
+	NormalTreeNode<T>* NextNode(NormalTreeNode<T> *node)
+	{
+
+	}
+
+
 
 	template <typename T, typename Pointer, typename Reference>
 	class NormalTreeIterator
@@ -160,7 +170,7 @@ namespace sp
 			return _node;
 		}
 
-		iterator insert(const value_type v)
+		iterator insert(const value_type& v)
 		{
 			return insert(const_iterator(root()), v);
 		}
@@ -170,13 +180,14 @@ namespace sp
 			Compare compare;
 			bool right = true;
 			node_pointer pos = position._node;
-			++_size;
 			node_pointer pNode = alloc_node(pos);
+			
+			++_size;
 			pNode->_value = v;
 
 			if (pos == &_node) // ¿ÕÊ÷
 			{
-				node._parent = node._lchild = pNode;
+				_node._parent = _node._lchild = pNode;
 				node_pointer(pNode)->_value = v;
 				return iterator(node_pointer(pNode));
 			}
@@ -212,9 +223,29 @@ namespace sp
 				pos->_lchild = pNode;
 			if (pos == _node._lchild && !right)
 				_node._lchild = pNode; // ¸üÐÂ begin()
+
 			return iterator(pos);
 		}
 
+		iterator find(const value_type& v)
+		{
+			find(const_iterator(root()), v);
+		}
+
+		iterator find(const const_iterator position, const value_type& v)
+		{
+			
+		}
+
+		void erase(const value_type& v)
+		{
+			erase(const_iterator(root()), v);
+		}
+
+		void erase(const const_iterator position, const value_type& v)
+		{
+			if ()
+		}
 		
 		void reset()
 		{
